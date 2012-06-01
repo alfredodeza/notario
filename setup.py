@@ -1,9 +1,11 @@
-import sys
-import os
+"""
+Notario
+=======
+A simple, flexible, dictionary validator with a powerful sense
+of error reporting.
+"""
 import re
 
-readme = os.path.join(os.path.dirname(__file__), 'README.rst')
-LONG_DESCRIPTION = open(readme).read()
 
 module_file = open("notario/__init__.py").read()
 metadata = dict(re.findall("__([a-z]+)__\s*=\s*'([^']+)'", module_file))
@@ -20,7 +22,7 @@ setup(
     license          = "MIT",
     zip_safe         = False,
     keywords         = "schema, validator, dictionary, enforce",
-    long_description = LONG_DESCRIPTION,
+    long_description = __doc__,
     classifiers      = [
                         'Development Status :: 4 - Beta',
                         'Intended Audience :: Developers',
@@ -39,6 +41,5 @@ setup(
                         'Programming Language :: Python :: 3.1',
                         'Programming Language :: Python :: 3.2',
                         'Programming Language :: Python :: Implementation :: PyPy'
-                      ],
-    **extra
+                      ]
 )
