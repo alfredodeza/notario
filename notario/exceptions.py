@@ -1,5 +1,6 @@
 from notario.utils import is_callable
 
+
 class Invalid(Exception):
     """
     This Exception class is used only by the :class:`Validator`
