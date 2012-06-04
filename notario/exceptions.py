@@ -12,10 +12,6 @@ class Invalid(Exception):
         self.schema_item = schema_item
         self.path = path
         self._reason = reason
-
-        # FIXME: How the hell are we supposed to persist attributed from our
-        # class to the Exception one? Neither of the above persist which is
-        # utterly annoying
         Exception.__init__(self, self.__str__())
 
     def __str__(self):
