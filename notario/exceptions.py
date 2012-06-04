@@ -11,7 +11,11 @@ class Invalid(Exception):
     def __init__(self, schema_item, path, reason=None):
         self.schema_item = schema_item
         self.path = path
-        self.reason = reason
+        self._reason = reason
+
+        # FIXME: How the hell are we supposed to persist attributed from our
+        # class to the Exception one? Neither of the above persist which is
+        # utterly annoying
         Exception.__init__(self, self.__str__())
 
     def __str__(self):
@@ -32,3 +36,10 @@ class Invalid(Exception):
             msg = "%s did not match %s" % (
                     self._format_path(), self.schema_item)
         return msg
+
+    @property
+    def reason(self):
+        try:
+            return self._reason[0]
+        except IndexError:
+            return self._reason

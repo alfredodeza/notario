@@ -24,3 +24,9 @@ class TestEnforce(object):
         with raises(Invalid) as exc:
             engine.enforce(1, 2, ' 1')
         assert exc.value[0] == '-> 1  did not match 2'
+
+    def test_callable_with_messages_are_passed_on(self):
+        def callable_message(v): assert False, "this is completely False"
+        with raises(Invalid) as exc:
+            engine.enforce(1, callable_message, ' 1')
+        assert exc.value.reason == "this is completely False"
