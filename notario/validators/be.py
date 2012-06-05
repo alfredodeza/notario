@@ -4,25 +4,31 @@ def string(value):
     """
     Validates a given input is of type string.
     """
-    return isinstance(value, basestring)
+    assert isinstance(value, basestring)
 
 
 def boolean(value):
     """
     Validates a given input is of type boolean.
     """
-    return isinstance(value, bool)
+    assert isinstance(value, bool)
 
 
 def dictionary(value):
     """
     Validates a given input is of type dictionary.
     """
-    return isinstance(value, dict)
+    assert isinstance(value, dict)
 
 
 def array(value):
     """
     Validates a given input is of type list.
     """
-    return isinstance(value, list)
+    assert isinstance(value, list)
+
+def integer(value):
+    """
+    Validates a given input is of type int..
+    """
+    assert isinstance(value, int), "not of type int"
