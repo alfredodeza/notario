@@ -7,8 +7,8 @@ def foo():
     """
     return True
 
-class TestInvalid(object):
 
+class TestInvalid(object):
 
     def test_include_the_key(self):
         error = exceptions.Invalid('key', ['foo', 'bar', 'key'])
@@ -29,10 +29,19 @@ class TestInvalid(object):
     def test_full_message(self):
         error = exceptions.Invalid('3', ['foo', 'bar', 'baz'])
         result = error.__str__()
-        assert '-> foo -> bar -> baz  did not match 3' == result
+        assert '-> foo -> bar -> baz key did not match 3' == result
 
     def test_full_message_for_callable(self):
         error = exceptions.Invalid(foo, ['foo', 'bar', 'baz'])
         result = error.__str__()
-        assert '-> foo -> bar -> baz  did not pass validation against callable: foo' == result
+        assert '-> foo -> bar -> baz key did not pass validation against callable: foo' == result
 
+    def test_full_message_for_value(self):
+        error = exceptions.Invalid('3', ['foo', 'bar', 'baz'], pair='value')
+        result = error.__str__()
+        assert '-> foo -> bar -> baz value did not match 3' == result
+
+    def test_full_message_for_callable_with_value(self):
+        error = exceptions.Invalid(foo, ['foo', 'bar', 'baz'], pair='value')
+        result = error.__str__()
+        assert '-> foo -> bar -> baz value did not pass validation against callable: foo' == result
