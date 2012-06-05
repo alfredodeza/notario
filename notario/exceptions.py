@@ -8,10 +8,11 @@ class Invalid(Exception):
     while traversing the configuration tree.
     """
 
-    def __init__(self, schema_item, path, reason=None):
+    def __init__(self, schema_item, path, reason=None, pair='key'):
         self.schema_item = schema_item
         self.path = path
         self._reason = reason
+        self._pair = pair
         Exception.__init__(self, self.__str__())
 
     def __str__(self):
@@ -22,7 +23,7 @@ class Invalid(Exception):
         for key in self.path:
             accessed_key = '-> %s ' % key
             message += accessed_key
-        return message
+        return message + self._pair
 
     def _get_message(self):
         if is_callable(self.schema_item):
