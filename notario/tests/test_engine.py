@@ -23,7 +23,7 @@ class TestEnforce(object):
     def test_unequal_params_raise_invalid(self):
         with raises(Invalid) as exc:
             engine.enforce(1, 2, ['1'], 'key')
-        assert exc.value[0] == '-> 1 -> 1 key did not match 2'
+        assert exc.value[0] == '-> 1 key did not match 2'
 
     def test_callable_with_messages_are_passed_on(self):
         def callable_message(v): assert False, "this is completely False"
@@ -42,3 +42,24 @@ class TestNormalizeSchema(object):
         data = ('a', ('a', 'b'))
         result = engine.normalize_schema(data)
         assert result == {0: ('a', {0: ('a', 'b')})}
+
+
+class TestValidator(object):
+
+    def test_validate_top_level_keys(self):
+        data = {'a': 1, 'b': 2}
+        schema = (('a', 1), ('c', 2))
+        with raises(Invalid) as exc:
+            validator = engine.Validator(data, schema)
+            validator.validate()
+
+        assert exc.value[0] == '-> b key did not match c'
+
+    def test_validate_top_level_values(self):
+        data = {'a': 1, 'b': 2}
+        schema = (('a', 1), ('b', 1))
+        with raises(Invalid) as exc:
+            validator = engine.Validator(data, schema)
+            validator.validate()
+
+        assert exc.value[0] == '-> b -> 2 value did not match 1'
