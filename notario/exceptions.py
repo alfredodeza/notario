@@ -19,7 +19,7 @@ class Invalid(Exception):
 
     def _format_path(self):
         message = ""
-        for key in self.path.split():
+        for key in self.path:
             accessed_key = '-> %s ' % key
             message += accessed_key
         return message
