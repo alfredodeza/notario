@@ -99,3 +99,13 @@ class TestValidator(object):
             validator.validate()
 
         assert exc.value[0] == '-> b -> b -> [1, 2, 3] value did not match [1, 1, 3]'
+
+    def test_validate_multiple_items_as_values(self):
+        data = {'a': 1, 'b': {'a': 2, 'b' : 1, 'd':1, 'c':2}}
+        schema = (('a', 1), ('b', (('a', 2), ('b', 1), ('c', 2), ('d', 2))))
+        with raises(Invalid) as exc:
+            validator = engine.Validator(data, schema)
+            validator.validate()
+
+        assert exc.value[0] == '-> b -> d -> 1 value did not match 2'
+
