@@ -108,4 +108,3 @@ class TestValidator(object):
             validator.validate()
 
         assert exc.value[0] == '-> b -> d -> 1 value did not match 2'
-

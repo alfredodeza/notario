@@ -9,38 +9,57 @@ class Validator(object):
         self.schema = normalize_schema(schema)
 
     def validate(self):
-        def validate_tuple(data, schema, k_tree, v_tree):
-            key, value = data
-            skey, svalue = schema
-            enforce(key, skey, k_tree, 'key')
-            enforce(value, svalue, k_tree, 'value')
+#        def validate_tuple(data, schema, tree):
+#            key, value = data
+#            skey, svalue = schema
+#            enforce(key, skey, tree, 'key')
+#            enforce(value, svalue, tree, 'value')
 
-        def traverser(data, schema, k_tree, v_tree, index=0):
-            for index in range(index, len(data)):
-                key, value = data[index]
-                skey, svalue = schema[index]
-
-                k_tree.append(key)
-                v_tree.append(value)
-                if isinstance(value, dict):
-                    return traverser(value, svalue, k_tree, v_tree)
-                else:
-                    validate_tuple(data[index], schema[index], k_tree, v_tree)
-                    k_tree.pop()
-                    v_tree.pop()
-
+#        def traverser(data, schema, tree):
+#            for index in range(len(data)):
+#                key, value = data[index]
+#                skey, svalue = schema[index]
+#
+#                tree.append(key)
+#                if isinstance(value, dict):
+#                    return traverser(value, svalue, tree)
+#                else:
+#                    self.leaf(data[index], schema[index], tree)
+#                    tree.pop()
 
         if len(self.data) != len(self.schema):
             raise Exception("lengths are no equal")
-        traverser(self.data, self.schema, [], [])
+        self.traverser(self.data, self.schema, [])
 
-    def key_value_validation(self, data_item, schema_item, tree):
+    def traverser(self, data, schema, tree):
         """
-        Will make recursion work better as we can call this
-        over and over again until all nested data structures
-        are processed and validated properly.
+        Traverses the dictionary, recursing onto itself if
+        it sees apropriate key/value pairs that indicate that
+        there is a need for more validation in a branch below us.
         """
-        return enforce(data_item, schema_item, tree)
+        for index in range(len(data)):
+            key, value = data[index]
+            skey, svalue = schema[index]
+
+            tree.append(key)
+            if isinstance(value, dict):
+                return self.traverser(value, svalue, tree)
+            else:
+                self.leaf(data[index], schema[index], tree)
+                tree.pop()
+
+
+    def leaf(self, data, schema, tree):
+        """
+        The deepest validation we can make in any given circumstance. Does not
+        recurse, it will just receive both values and the tree, passing them on
+        to the :fun:`enforce` function.
+        """
+        key, value = data
+        skey, svalue = schema
+        enforce(key, skey, tree, 'key')
+        enforce(value, svalue, tree, 'value')
+
 
 
 def normalize(data_structure, sort=True):
