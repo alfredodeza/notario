@@ -63,3 +63,39 @@ class TestValidator(object):
             validator.validate()
 
         assert exc.value[0] == '-> b -> 2 value did not match 1'
+
+    def test_validate_value_nested_dictionaries(self):
+        data = {'a': 1, 'b': {'a': 2, 'b' : 1}}
+        schema = (('a', 1), ('b', (('a', 2), ('b', 2))))
+        with raises(Invalid) as exc:
+            validator = engine.Validator(data, schema)
+            validator.validate()
+
+        assert exc.value[0] == '-> b -> b -> 1 value did not match 2'
+
+    def test_validate_key_nested_dictionaries(self):
+        data = {'a': 1, 'b': {'a': 2, 'b' : 1}}
+        schema = (('a', 1), ('b', (('b', 2), ('b', 1))))
+        with raises(Invalid) as exc:
+            validator = engine.Validator(data, schema)
+            validator.validate()
+
+        assert exc.value[0] == '-> b -> a key did not match b'
+
+    def test_validate_value_nested_arrays(self):
+        data = {'a': 1, 'b': {'a': 2, 'b' : [1, 2, 3]}}
+        schema = (('a', 1), ('b', (('a', 2), ('b', [1, 1, 3]))))
+        with raises(Invalid) as exc:
+            validator = engine.Validator(data, schema)
+            validator.validate()
+
+        assert exc.value[0] == '-> b -> b -> [1, 2, 3] value did not match [1, 1, 3]'
+
+    def test_validate_key_nested_arrays(self):
+        data = {'a': 1, 'b': {'a': 2, 'b' : [1, 2, 3]}}
+        schema = (('a', 1), ('b', (('a', 2), ('b', [1, 1, 3]))))
+        with raises(Invalid) as exc:
+            validator = engine.Validator(data, schema)
+            validator.validate()
+
+        assert exc.value[0] == '-> b -> b -> [1, 2, 3] value did not match [1, 1, 3]'
