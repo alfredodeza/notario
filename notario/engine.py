@@ -1,4 +1,4 @@
-from notario.exceptions import Invalid
+from notario.exceptions import Invalid, SchemaError
 from notario.utils import is_callable
 
 
@@ -9,26 +9,6 @@ class Validator(object):
         self.schema = normalize_schema(schema)
 
     def validate(self):
-#        def validate_tuple(data, schema, tree):
-#            key, value = data
-#            skey, svalue = schema
-#            enforce(key, skey, tree, 'key')
-#            enforce(value, svalue, tree, 'value')
-
-#        def traverser(data, schema, tree):
-#            for index in range(len(data)):
-#                key, value = data[index]
-#                skey, svalue = schema[index]
-#
-#                tree.append(key)
-#                if isinstance(value, dict):
-#                    return traverser(value, svalue, tree)
-#                else:
-#                    self.leaf(data[index], schema[index], tree)
-#                    tree.pop()
-
-        if len(self.data) != len(self.schema):
-            raise Exception("lengths are no equal")
         self.traverser(self.data, self.schema, [])
 
     def traverser(self, data, schema, tree):
@@ -37,6 +17,9 @@ class Validator(object):
         it sees apropriate key/value pairs that indicate that
         there is a need for more validation in a branch below us.
         """
+        if len(data) != len(schema):
+            raise SchemaError(data, tree, reason='length did not match schema')
+
         for index in range(len(data)):
             key, value = data[index]
             skey, svalue = schema[index]
