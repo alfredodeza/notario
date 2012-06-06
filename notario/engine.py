@@ -4,7 +4,7 @@ from notario.utils import is_callable
 
 class Validator(object):
 
-    def __init__(self, data, schema, **kw):
+    def __init__(self, data, schema):
         self.data = normalize(data)
         self.schema = normalize_schema(schema)
 
@@ -90,12 +90,12 @@ def enforce(data_item, schema_item, tree, pair):
             raise Invalid(schema_item, tree, pair=pair)
 
 
-def validate(data, schema, **kw):
+def validate(data, schema):
     """
     Main entry point for the validation engine.
 
     :param data: The incoming data, as a dictionary object.
     :param schema: The schema from which data will be validated against
     """
-    validator = Validator(data, schema, **kw)
+    validator = Validator(data, schema)
     validator.validate()
