@@ -67,6 +67,8 @@ def normalize_schema(data_structure):
             if len(value) == 2 and isinstance(value[1], tuple): # a nested tuple
                 new_struct[i] = (value[0], normalize_schema(value[1]))
         return new_struct
+    elif len(data_structure) > 2:
+        return dict((number, value) for number, value in enumerate(data_structure))
     else:
         return {0: data_structure}
 
