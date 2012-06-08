@@ -1,4 +1,4 @@
-from notario.engine import Validator
+from notario.engine import RecursiveValidator
 
 
 class BasicRecursiveValidator(object):
@@ -21,7 +21,7 @@ class AnyObject(BasicRecursiveValidator):
 
     def __call__(self, data, tree):
         index = len(data) - 1
-        validator = Validator(data, self.schema, tree, index=index)
+        validator = RecursiveValidator(data, self.schema, tree, index=index)
         validator.validate()
 
 
@@ -31,5 +31,5 @@ class AllObjects(BasicRecursiveValidator):
     """
 
     def __call__(self, data, tree):
-        validator = Validator(data, self.schema, tree)
+        validator = RecursiveValidator(data, self.schema, tree)
         validator.validate()
