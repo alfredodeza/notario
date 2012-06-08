@@ -1,28 +1,36 @@
+from notario.engine import Validator, IterableValidator
 
 
-class Any(object):
+class BasicIterableValidator(object):
     """
-    Grab the first item and apply the schema needed
+    Base class for iterable validators, can be sub-classed
+    for other type of iterable validators but should not be
+    used directly.
     """
+
+    __validator_iterable__ = True
 
     def __init__(self, schema):
         self.schema = schema
 
-    def __call__(self, data):
-        # call validator here against data
-        pass
+
+class AnyItem(BasicIterableValidator):
+    """
+    Grab the first item and apply the schema needed
+    """
+
+    def __call__(self, data, tree):
+        index = len(data) - 1
+        validator = IterableValidator(data, self.schema, tree, index=index)
+        validator.validate()
 
 
-class All(object):
+class AllItems(BasicIterableValidator):
     """
     For all the items in an array apply the schema
     passed in
     """
 
-    def __init__(self, schema):
-        self.schema = schema
-
-    def __call__(self, data):
-        # call validator here against data
-        pass
-
+    def __call__(self, data, tree):
+        validator = IterableValidator(data, self.schema, tree)
+        validator.validate()
