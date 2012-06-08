@@ -11,4 +11,4 @@
 notario
 =======
 
-Validation of Python dictionaries
+Has the ability to validate against dictionaries in both keys *and* values.
