@@ -33,7 +33,6 @@ class Validator(object):
                 self.leaf(data[index], schema[index], tree)
                 tree.pop()
 
-
     def leaf(self, data, schema, tree):
         """
         The deepest validation we can make in any given circumstance. Does not
@@ -53,7 +52,6 @@ class Validator(object):
             return
         if len(data) != len(schema):
             raise SchemaError(data, tree, reason='length did not match schema')
-
 
 
 class IterableValidator(Validator):

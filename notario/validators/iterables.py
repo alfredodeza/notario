@@ -1,4 +1,4 @@
-from notario.engine import Validator, IterableValidator
+from notario.engine import IterableValidator
 
 
 class BasicIterableValidator(object):
