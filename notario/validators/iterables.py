@@ -8,7 +8,7 @@ class BasicIterableValidator(object):
     used directly.
     """
 
-    __validator_iterable__ = True
+    __validator_leaf__ = True
 
     def __init__(self, schema):
         self.schema = schema

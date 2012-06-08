@@ -18,7 +18,7 @@ class Validator(object):
         it sees apropriate key/value pairs that indicate that
         there is a need for more validation in a branch below us.
         """
-        if hasattr(schema, '__validator_iterable__'):
+        if hasattr(schema, '__validator_leaf__'):
             return schema(data, tree)
 
         for index in range(len(data)):
@@ -43,13 +43,13 @@ class Validator(object):
         key, value = data
         skey, svalue = schema
         enforce(key, skey, tree, 'key')
-        if hasattr(svalue, '__validator_iterable__'):
+        if hasattr(svalue, '__validator_leaf__'):
             return svalue(value, tree)
         enforce(value, svalue, tree, 'value')
 
 
     def length_equality(self, data, schema, tree):
-        if hasattr(schema, '__validator_iterable__'):
+        if hasattr(schema, '__validator_leaf__'):
             return
         if len(data) != len(schema):
             raise SchemaError(data, tree, reason='length did not match schema')
