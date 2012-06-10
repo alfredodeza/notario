@@ -125,7 +125,6 @@ class TestValidator(object):
         assert exc.value[0] == '-> b -> d -> 1 value did not match 2'
 
 
-
 class TestValidatorLeaves(object):
     """
     The Validator object would behave differently with
@@ -164,16 +163,15 @@ class TestRecursiveValidator(object):
 
     def test_deal_with_recursion(self):
         data = {'a': {'a':'a', 'b':{'a': 'b', 'c':'c', 'd':1}}}
-        schema = ('a', (('a', 'a'), ('b', recursive.AllObjects((types.String, types.String)))))
+        schema = ('a', (('a', 'a'), ('b', recursive.AllObjects((types.string, types.string)))))
         with raises(Invalid) as exc:
             validator = engine.Validator(data, schema)
             validator.validate()
 
-        assert exc.value[0] == '-> a -> b -> d value did not pass validation against callable: String'
+        assert exc.value[0] == '-> a -> b -> d value did not pass validation against callable: string'
 
 
 class TestIterableValidator(object):
 
     def test_bad_index_number(self):
         pass
-
