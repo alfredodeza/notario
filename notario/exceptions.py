@@ -39,7 +39,7 @@ class Invalid(Exception):
     @property
     def reason(self):
         try:
-            return self._reason[0]
+            return self._reason.args[0]
         except IndexError:
             return self._reason
 
