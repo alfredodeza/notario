@@ -1,3 +1,4 @@
+import sys
 from notario.exceptions import Invalid, SchemaError
 from notario.utils import is_callable
 
@@ -153,7 +154,8 @@ def enforce(data_item, schema_item, tree, pair):
     if is_callable(schema_item):
         try:
             schema_item(data_item)
-        except AssertionError as e:
+        except AssertionError:
+            e = sys.exc_info()[1]
             raise Invalid(schema_item, tree, reason=e, pair=pair)
     else:
         try:
