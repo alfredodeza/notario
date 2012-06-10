@@ -1,6 +1,7 @@
 """
 Basic type validators
 """
+from notario._compat import basestring
 
 def string(value):
     """
