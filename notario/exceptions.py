@@ -27,14 +27,15 @@ class Invalid(Exception):
             return message + self._pair
         return message or "top level"
 
-    def _get_message(self):
+    def _format_message(self):
         if is_callable(self.schema_item):
-            msg = "%s did not pass validation against callable: %s" % (
-                    self._format_path(), self.schema_item.__name__)
+            msg = "did not pass validation against callable: %s" % (self.schema_item.__name__)
         else:
-            msg = "%s did not match %s" % (
-                    self._format_path(), self.schema_item)
+            msg = "did not match %s" % (self.schema_item)
         return msg
+
+    def _get_message(self):
+        return "%s %s" % (self._format_path(), self._format_message())
 
     @property
     def reason(self):

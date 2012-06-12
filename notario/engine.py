@@ -43,7 +43,6 @@ class Validator(object):
         skey, svalue = schema
         enforce(key, skey, tree, 'key')
         if hasattr(svalue, '__validator_leaf__'):
-            print tree
             return svalue(value, tree)
         enforce(value, svalue, tree, 'value')
 
@@ -87,15 +86,21 @@ class IterableValidator(Validator):
 
     def leaves(self, data, schema, tree):
         for item_index in range(self.index, len(data)):
-            try:
-                if (data[item_index], dict) and isinstance(schema, tuple):
+            if (data[item_index], dict) and isinstance(schema, tuple):
+                try:
                     _validator = Validator(data[item_index], schema)
                     return _validator.validate()
-                else:
+                except Invalid:
+                    e = sys.exc_info()[1]
+                    tree.append('list[%s]' % item_index)
+                    tree.extend(e.path)
+                    raise Invalid(e.schema_item, tree, pair='value')
+            else:
+                try:
                     assert data[item_index] == schema
-            except (AssertionError, Invalid):
-                tree.append('list[%s]' % item_index)
-                raise Invalid(schema, tree, 'value')
+                except AssertionError:
+                    tree.append('list[%s]' % item_index)
+                    raise Invalid(schema, tree, pair='value')
 
 
 class RecursiveValidator(Validator):
