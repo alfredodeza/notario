@@ -20,7 +20,13 @@ class Validator(object):
         there is a need for more validation in a branch below us.
         """
         if hasattr(schema, '__validator_leaf__'):
-            return schema(data)
+            try:
+                return schema(data)
+            except Invalid:
+                e = sys.exc_info()[1]
+                tree.extend(e.path)
+                raise Invalid(e.schema_item, tree, pair='value')
+
         for index in range(len(data)):
             self.length_equality(data, schema, index, tree)
             key, value = data[index]
@@ -100,7 +106,7 @@ class IterableValidator(Validator):
                     assert data[item_index] == schema
                 except AssertionError:
                     tree.append('list[%s]' % item_index)
-                    raise Invalid(schema, tree, pair='value')
+                    raise Invalid(schema, tree, pair='item')
 
 
 class RecursiveValidator(Validator):

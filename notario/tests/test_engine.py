@@ -68,7 +68,7 @@ class TestValidator(object):
             validator = engine.Validator(data, schema)
             validator.validate()
 
-        assert exc.value.args[0] == ' length did not match schema'
+        assert exc.value.args[0] == 'top level length did not match schema'
 
     def test_validate_top_level_values(self):
         data = {'a': 1, 'b': 2}
@@ -138,7 +138,7 @@ class TestValidatorLeaves(object):
             validator = engine.Validator(data, schema)
             validator.validate()
 
-        assert exc.value.args[0] == '-> a -> b -> list[0] key did not match 2'
+        assert exc.value.args[0] == '-> a -> b -> list[0] item did not match 2'
 
     def test_traverser_returns_the_recursive_leaf_if_seen(self):
         data = {'a': {'b': [1, 1, 1, 1]}}
@@ -155,11 +155,11 @@ class TestRecursiveValidator(object):
     def test_bad_index_number(self):
         data = {'a': {'a':'a', 'b':'b'}}
         schema = ('a', 'a')
-        recursive_validator = recursive.RecursiveValidator(data, schema, ['a'], index=100)
+        recursive_validator = recursive.RecursiveValidator(data, schema, index=100)
         with raises(SchemaError) as exc:
             recursive_validator.validate()
 
-        assert exc.value.args[0] == '-> a  not enough items in data to select from'
+        assert exc.value.args[0] == 'top level not enough items in data to select from'
 
     def test_deal_with_recursion(self):
         data = {'a': {'a':'a', 'b':{'a': 'b', 'c':'c', 'd':1}}}
