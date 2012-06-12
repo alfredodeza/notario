@@ -10,7 +10,7 @@ class Validator(object):
         self.schema = normalize_schema(schema)
 
     def validate(self):
-        self.length_equality(self.data, self.schema, [])
+        self.length_equality(self.data, self.schema, 0, [])
         self.traverser(self.data, self.schema, [])
 
     def traverser(self, data, schema, tree):
@@ -20,16 +20,15 @@ class Validator(object):
         there is a need for more validation in a branch below us.
         """
         if hasattr(schema, '__validator_leaf__'):
-            return schema(data, tree)
-
+            return schema(data)
         for index in range(len(data)):
-            self.length_equality(data[index], schema[index], tree)
+            self.length_equality(data, schema, index, tree)
             key, value = data[index]
             skey, svalue = schema[index]
-
             tree.append(key)
             if isinstance(value, dict):
-                return self.traverser(value, svalue, tree)
+                self.traverser(value, svalue, tree)
+                tree.pop()
             else:
                 self.leaf(data[index], schema[index], tree)
                 tree.pop()
@@ -44,11 +43,17 @@ class Validator(object):
         skey, svalue = schema
         enforce(key, skey, tree, 'key')
         if hasattr(svalue, '__validator_leaf__'):
+            print tree
             return svalue(value, tree)
         enforce(value, svalue, tree, 'value')
 
 
-    def length_equality(self, data, schema, tree):
+    def length_equality(self, data, schema, index, tree):
+        try:
+            data = data[index]
+            schema = schema[index]
+        except KeyError:
+            raise SchemaError(data, tree, reason="less items in schema than in data")
         if hasattr(schema, '__validator_leaf__'):
             return
         if len(data) != len(schema):
@@ -83,8 +88,12 @@ class IterableValidator(Validator):
     def leaves(self, data, schema, tree):
         for item_index in range(self.index, len(data)):
             try:
-                assert data[item_index] == schema
-            except AssertionError:
+                if (data[item_index], dict) and isinstance(schema, tuple):
+                    _validator = Validator(data[item_index], schema)
+                    return _validator.validate()
+                else:
+                    assert data[item_index] == schema
+            except (AssertionError, Invalid):
                 tree.append('list[%s]' % item_index)
                 raise Invalid(schema, tree, 'value')
 
@@ -95,29 +104,29 @@ class RecursiveValidator(Validator):
     run against any number of items in a given data structure
     """
 
-    def __init__(self, data, schema, tree, index=None):
+    def __init__(self, data, schema, index=None):
         self.data = data
         self.schema = normalize_schema(schema)
-        self.tree = tree
+        self.tree = []
         self.index = index or 0
 
     def validate(self):
-        self.traverser(self.data, self.tree)
+        self.traverser(self.data, self.schema, self.tree)
 
-    def traverser(self, data, tree):
+    def traverser(self, data, schema, tree):
         if len(data) < self.index:
             raise SchemaError(data, tree, reason="not enough items in data to select from")
         for index in range(self.index, len(data)):
-            self.length_equality(data[index], self.schema[0], tree)
+            self.length_equality(data, schema, index, tree)
             key, value = data[index]
-            skey, svalue = self.schema[0]
+            skey, svalue = schema[index]
 
             tree.append(key)
             if isinstance(value, dict):
                 return self.traverser(value, svalue, tree)
             else:
-                self.leaf(data[index], self.schema[0], tree)
-                tree.pop()
+                self.leaf(data[index], schema[index], tree)
+            tree.pop()
 
 
 def normalize(data_structure, sort=True):
@@ -145,7 +154,15 @@ def normalize_schema(data_structure):
                 new_struct[i] = (value[0], normalize_schema(value[1]))
         return new_struct
     elif len(data_structure) > 2:
-        return dict((number, value) for number, value in enumerate(data_structure))
+        if not isinstance(data_structure[0], tuple):
+            new_struct = {0: (data_structure[0], normalize_schema(data_structure[1]))}
+        else:
+            new_struct = dict((number, value) for number, value in enumerate(data_structure))
+        for i in range(len(new_struct)):
+            value = new_struct.get(i)
+            if len(value) == 2 and isinstance(value[1], tuple): # a nested tuple
+                new_struct[i] = (value[0], normalize_schema(value[1]))
+        return new_struct
     else:
         return {0: data_structure}
 
