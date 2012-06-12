@@ -25,7 +25,7 @@ class Invalid(Exception):
             message += accessed_key
         if use_pair:
             return message + self._pair
-        return message
+        return message or "top level"
 
     def _get_message(self):
         if is_callable(self.schema_item):
