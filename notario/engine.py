@@ -52,13 +52,12 @@ class Validator(object):
             return svalue(value, tree)
         enforce(value, svalue, tree, 'value')
 
-
     def length_equality(self, data, schema, index, tree):
         try:
             data = data[index]
             schema = schema[index]
         except KeyError:
-            raise SchemaError(data, tree, reason="less items in schema than in data")
+            raise SchemaError(data, tree, reason="has less items in schema than in data")
         if hasattr(schema, '__validator_leaf__'):
             return
         if len(data) != len(schema):
