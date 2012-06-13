@@ -23,7 +23,7 @@ class Invalid(Exception):
         for key in self.path:
             accessed_key = '-> %s ' % key
             message += accessed_key
-        if use_pair:
+        if use_pair and self._pair != 'value':
             return message + self._pair
         return message or "top level"
 
