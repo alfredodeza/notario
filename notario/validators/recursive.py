@@ -21,7 +21,7 @@ class AnyObject(BasicRecursiveValidator):
 
     def __call__(self, data):
         index = len(data) - 1
-        validator = RecursiveValidator(data, self.schema, index=index)
+        validator = RecursiveValidator(data, self.schema, [], index=index)
         validator.validate()
 
 
@@ -31,5 +31,5 @@ class AllObjects(BasicRecursiveValidator):
     """
 
     def __call__(self, data):
-        validator = RecursiveValidator(data, self.schema)
+        validator = RecursiveValidator(data, self.schema, [])
         validator.validate()
