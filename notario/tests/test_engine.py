@@ -110,6 +110,15 @@ class TestValidator(object):
 
         assert exc.value.args[0] == '-> b -> b -> 1 value did not match 2'
 
+    def test_validate_key_doubly_nested_dictionaries(self):
+        data = {'a': 1, 'b': {'a': 2, 'b' : {'a':'a'}}}
+        schema = (('a', 1), ('b', (('a', 2), ('b', ('a', 'b')))))
+        with raises(Invalid) as exc:
+            validator = engine.Validator(data, schema)
+            validator.validate()
+
+        assert exc.value.args[0] == '-> b -> b -> a -> a value did not match b'
+
     def test_validate_key_nested_dictionaries(self):
         data = {'a': 1, 'b': {'a': 2, 'b' : 1}}
         schema = (('a', 1), ('b', (('b', 2), ('b', 1))))
