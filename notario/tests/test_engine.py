@@ -195,5 +195,30 @@ class TestRecursiveValidator(object):
 
 class TestIterableValidator(object):
 
-    def test_bad_index_number(self):
-        pass
+    def test_not_enough_items_in_data(self):
+        data = {0: ('a', 'b')}
+        schema = {0: ('a', 'b')}
+        iter_validator = engine.IterableValidator(data, schema, index=100)
+        with raises(SchemaError) as exc:
+            iter_validator.validate()
+
+        assert exc.value.args[0] == 'top level has not enough items to select from'
+
+    def test_validate_nested_array(self):
+        data = [{'a':'a'}, {'b': 'b'}]
+        schema = (types.string, 'b') # note how this is not normalized
+        iter_validator = engine.IterableValidator(data, schema, index=0)
+        with raises(Invalid) as exc:
+            iter_validator.validate()
+
+        assert exc.value.args[0] == '-> list[0] -> a -> a value did not match b'
+
+    def test_validate_nested_array(self):
+        data = [{'a':'b'}, {'b': 'c'}]
+        schema = (types.string, 'b') # note how this is not normalized
+        iter_validator = engine.IterableValidator(data, schema, index=0)
+        with raises(Invalid) as exc:
+            iter_validator.validate()
+
+        assert exc.value.args[0] == '-> list[1] -> b -> c value did not match b'
+
