@@ -74,6 +74,24 @@ class TestValidator(object):
 
         assert exc.value.args[0] == 'top level length did not match schema'
 
+    def test_validate_length_equality_less_items(self):
+        data = {'a': 1, 'b': 2, 'c':'c'}
+        schema = (('a', 1), ('b', 2))
+        with raises(SchemaError) as exc:
+            validator = engine.Validator(data, schema)
+            validator.validate()
+
+        assert exc.value.args[0] == 'top level has less items in schema than in data'
+
+    def test_validate_length_equality_returns(self):
+        data = {0:('a', 1)}
+        class _Schema(object):
+            __validator_leaf__ = True
+        schema = {0:_Schema()}
+        validator = engine.Validator({}, {})
+        result = validator.length_equality(data, schema, 0, [])
+        assert result is None
+
     def test_validate_top_level_values(self):
         data = {'a': 1, 'b': 2}
         schema = (('a', 1), ('b', 1))
