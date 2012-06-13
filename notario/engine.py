@@ -65,22 +65,25 @@ class Validator(object):
             raise SchemaError(data, tree, reason='length did not match schema')
 
 
-class IterableValidator(object):
+class BaseItemValidator(object):
+
+    def __init__(self, data, schema, tree=None, index=None):
+        self.data = data
+        self.schema = schema
+        self.tree = tree or []
+        self.index = index or 0
+
+    def validate(self):
+        self.traverser(self.data, self.schema, self.tree)
+
+
+class IterableValidator(BaseItemValidator):
     """
     The iterable validator allows the definition of a single schema that can be
     run against any number of items in a given data structure
     """
 
-    def __init__(self, data, schema, tree, index=None):
-        self.data = data
-        self.schema = schema
-        self.tree = tree
-        self.index = index or 0
-
-    def validate(self):
-        self.traverser(self.data, self.tree)
-
-    def traverser(self, data, tree):
+    def traverser(self, data, schema, tree):
         """
         Here there is really no need for traversing any more
         we are running under the assumption that we are an actual
@@ -109,28 +112,20 @@ class IterableValidator(object):
                     raise Invalid(schema, tree, pair='item')
 
 
-class RecursiveValidator(object):
+class RecursiveValidator(BaseItemValidator):
     """
     The recursive validator allows the definition of a single schema that can be
     run against any number of items in a given data structure
     """
 
-    def __init__(self, data, schema, index=None):
-        self.data = data
-        self.schema = normalize_schema(schema)
-        self.tree = []
-        self.index = index or 0
-
-    def validate(self):
-        self.traverser(self.data, self.schema, self.tree)
-
     def traverser(self, data, schema, tree):
+        schema = normalize_schema(self.schema)
         if len(data) < self.index:
             raise SchemaError(data, tree, reason="not enough items in data to select from")
         for index in range(self.index, len(data)):
             _validate = Validator({}, {})
             _validate.data = {0: data[index]}
-            _validate.schema = self.schema
+            _validate.schema = schema
             _validate.validate()
 
 
