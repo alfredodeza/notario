@@ -143,17 +143,7 @@ def normalize(data_structure, sort=True):
 
 
 def normalize_schema(data_structure):
-    if len(data_structure) == 2 and isinstance(data_structure[1], tuple):
-        if not isinstance(data_structure[0], tuple):
-            new_struct = {0: (data_structure[0], normalize_schema(data_structure[1]))}
-        else:
-            new_struct = dict((number, value) for number, value in enumerate(data_structure))
-        for i in range(len(new_struct)):
-            value = new_struct.get(i)
-            if len(value) == 2 and isinstance(value[1], tuple): # a nested tuple
-                new_struct[i] = (value[0], normalize_schema(value[1]))
-        return new_struct
-    elif len(data_structure) > 2:
+    if len(data_structure) == 2 and isinstance(data_structure[1], tuple) or len(data_structure) > 2:
         if not isinstance(data_structure[0], tuple):
             new_struct = {0: (data_structure[0], normalize_schema(data_structure[1]))}
         else:
