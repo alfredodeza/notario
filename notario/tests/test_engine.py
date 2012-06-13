@@ -49,6 +49,10 @@ class TestNormalizeSchema(object):
         result = engine.normalize_schema(data)
         assert result == {0: ('a', {0: ('a', 'b'), 1: ('c', 'c'), 2: ('d', 'd')})}
 
+    def test_basic_key_value_pairs(self):
+        data = (('a', 'b'), ('b', 'b'), ('c', 'c'))
+        result = engine.normalize_schema(data)
+        assert result == {0: ('a', 'b'), 1: ('b', 'b'), 2: ('c', 'c')}
 
 class TestValidator(object):
 
