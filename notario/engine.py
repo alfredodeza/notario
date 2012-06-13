@@ -25,7 +25,7 @@ class Validator(object):
             except Invalid:
                 e = sys.exc_info()[1]
                 tree.extend(e.path)
-                raise Invalid(e.schema_item, tree, pair='value')
+                raise Invalid(e.schema_item, tree, pair=e._pair)
 
         for index in range(len(data)):
             self.length_equality(data, schema, index, tree)
@@ -65,7 +65,7 @@ class Validator(object):
             raise SchemaError(data, tree, reason='length did not match schema')
 
 
-class IterableValidator(Validator):
+class IterableValidator(object):
     """
     The iterable validator allows the definition of a single schema that can be
     run against any number of items in a given data structure
@@ -109,7 +109,7 @@ class IterableValidator(Validator):
                     raise Invalid(schema, tree, pair='item')
 
 
-class RecursiveValidator(Validator):
+class RecursiveValidator(object):
     """
     The recursive validator allows the definition of a single schema that can be
     run against any number of items in a given data structure
@@ -128,16 +128,10 @@ class RecursiveValidator(Validator):
         if len(data) < self.index:
             raise SchemaError(data, tree, reason="not enough items in data to select from")
         for index in range(self.index, len(data)):
-            self.length_equality(data, schema, index, tree)
-            key, value = data[index]
-            skey, svalue = schema[index]
-
-            tree.append(key)
-            if isinstance(value, dict):
-                return self.traverser(value, svalue, tree)
-            else:
-                self.leaf(data[index], schema[index], tree)
-            tree.pop()
+            _validate = Validator({}, {})
+            _validate.data = {0: data[index]}
+            _validate.schema = self.schema
+            _validate.validate()
 
 
 def normalize(data_structure, sort=True):
