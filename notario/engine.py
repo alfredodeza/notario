@@ -89,7 +89,7 @@ class IterableValidator(BaseItemValidator):
         leaf and there is no more to recurse into.
         """
         if len(data) < self.index:
-            raise SchemaError(data, tree, reason="not enough items in data to select from")
+            raise SchemaError(data, tree, reason="has not enough items to select from")
         self.leaves(data, self.schema, tree)
 
     def leaves(self, data, schema, tree):
@@ -97,7 +97,7 @@ class IterableValidator(BaseItemValidator):
             if (data[item_index], dict) and isinstance(schema, tuple):
                 try:
                     _validator = Validator(data[item_index], schema)
-                    return _validator.validate()
+                    _validator.validate()
                 except Invalid:
                     e = sys.exc_info()[1]
                     tree.append('list[%s]' % item_index)
