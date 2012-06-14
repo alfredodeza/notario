@@ -30,7 +30,7 @@ class TestAnyObject(object):
         with raises(Invalid) as exc:
             any_object = recursive.AnyObject(schema)
             any_object(data, [])
-        msg = '-> {}  did not contain any valid objects against callable: AnyObject'
+        msg = 'top level did not contain any valid objects against callable: AnyObject'
         assert exc.value.args[0] == msg
 
     def test_any_object_pass_first(self):
