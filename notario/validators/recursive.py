@@ -27,10 +27,12 @@ class AnyObject(BasicRecursiveValidator):
             try:
                 return validator.leaf(item_index)
             except Invalid:
+                if tree:
+                    tree.pop
                 pass
 
         msg = "did not contain any valid objects against callable: %s" % self.__class__.__name__
-        raise Invalid(self.schema, ['{}'], pair='value', msg=msg)
+        raise Invalid(self.schema, tree, pair='value', msg=msg)
 
 
 
