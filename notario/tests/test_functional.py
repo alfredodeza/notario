@@ -91,31 +91,39 @@ class TestValidate(object):
 class TestWithIterableValidators(object):
 
     def test_all_items_pass(self):
-        data = {'a': [1,2,3,4,5]}
+        data = {'a': [1, 2, 3, 4, 5]}
         schema = ('a', iterables.AllItems(types.integer))
         assert validate(data, schema) is None
 
-    def test_any_items(self):
+    def test_any_items_pass(self):
         data = {'a': [1,2, 'a string' ,4,5]}
         schema = ('a', iterables.AnyItem(types.string))
         assert validate(data, schema) is None
 
     def test_all_items_fail(self):
-        data = {'a': [1,2, '3',4,5]}
+        data = {'a': [1, 2, '3', 4, 5]}
         schema = ('a', iterables.AllItems(types.integer))
         with raises(Invalid) as exc:
             validate(data, schema)
         assert exc.value.args[0] == '-> a -> list[2] item did not pass validation against callable: integer'
 
+    def test_all_items_fail_non_callable(self):
+        data = {'a': [1, 2, '3', 4, 5]}
+        schema = ('a', iterables.AllItems('foo'))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> a -> list[0] item did not match foo'
+
+
     def test_any_items_fail(self):
-        data = {'a': [1, 2, 3,4,5]}
+        data = {'a': [1, 2, 3, 4, 5]}
         schema = ('a', iterables.AnyItem(types.string))
         with raises(Invalid) as exc:
             validate(data, schema)
         assert exc.value.args[0] == '-> a -> list[]  did not contain any valid items against callable: string'
 
     def test_any_items_fail_non_callable(self):
-        data = {'a': [1, 2, 3,4,5]}
+        data = {'a': [1, 2, 3, 4, 5]}
         schema = ('a', iterables.AnyItem('foo'))
         with raises(Invalid) as exc:
             validate(data, schema)
