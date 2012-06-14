@@ -53,11 +53,11 @@ value complies with the expectation. The following example is how one of the
 validators from ``notario`` itself is written to make sure a value is a
 string::
 
-   def string(value):
-    """
-    Validates a given input is of type string.
-    """
-    assert isinstance(value, basestring), "not of type string"
+    def string(value):
+        """
+        Validates a given input is of type string.
+        """
+        assert isinstance(value, basestring), "not of type string"
 
 If the ``value`` passed in is not a string, it will raise an
 ``AsssertionError`` and ``notario`` will catch this and report back where and
