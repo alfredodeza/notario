@@ -1,5 +1,6 @@
 from notario.exceptions import Invalid
 from notario.engine import IterableValidator
+from notario.utils import is_callable
 
 
 class BasicIterableValidator(object):
@@ -27,10 +28,14 @@ class AnyItem(BasicIterableValidator):
             try:
                 return validator.leaf(item_index)
             except Invalid:
+                tree.pop()
                 pass
 
         tree.append('list[]')
-        msg = "did not contain any valid items matching %s" % self.schema
+        if is_callable(self.schema):
+            msg = "did not contain any valid items against callable: %s" % self.schema.__name__
+        else:
+            msg = "did not contain any valid items matching %s" % self.schema
         raise Invalid(self.schema, tree, pair='value', msg=msg)
 
 
