@@ -107,7 +107,10 @@ class IterableValidator(BaseItemValidator):
                 raise Invalid(e.schema_item, tree, pair='value')
         else:
             try:
-                assert data[item_index] == schema
+                if is_callable(schema):
+                    schema(data[item_index])
+                else:
+                    assert data[item_index] == schema
             except AssertionError:
                 tree.append('list[%s]' % item_index)
                 raise Invalid(schema, tree, pair='item')
