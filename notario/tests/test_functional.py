@@ -170,3 +170,33 @@ class TestWithRecursiveValidators(object):
             validate(data, schema)
         assert exc.value.args[0] == '-> a  did not contain any valid objects against callable: AnyObject'
 
+    def test_no_pollution_from_previous_traversing_all_objects(self):
+        data = {
+                'a' : { 'a': 1, 'b': 2 },
+                'b' : { 'c' :1, 'd': 2 },
+                'c' : { 'e': 1, 'f': 2 }
+            }
+        schema = (
+                ('a', (('a', 1), ('b', 2))),
+                ('b', (('c', 1), ('d', 2))),
+                ('c', recursive.AllObjects((types.string, types.string)))
+            )
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> c -> e  did not pass validation against callable: string'
+
+    def test_no_pollution_from_previous_traversing_all_items(self):
+        data = {
+                'a' : { 'a': 1, 'b': 2 },
+                'b' : { 'c' :1, 'd': 2 },
+                'c' : ['e', 1, 'f', 2 ]
+            }
+        schema = (
+                ('a', (('a', 1), ('b', 2))),
+                ('b', (('c', 1), ('d', 2))),
+                ('c', iterables.AllItems(types.string))
+            )
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> c -> list[1] item did not pass validation against callable: string'
+
