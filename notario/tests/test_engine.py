@@ -190,7 +190,7 @@ class TestRecursiveValidator(object):
         with raises(SchemaError) as exc:
             recursive_validator.validate()
 
-        assert exc.value.args[0] == 'top level not enough items in data to select from'
+        assert exc.value.args[0] == 'top level not enough items to select from'
 
     def test_deal_with_recursion(self):
         data = {'a': {'a':'a', 'b':{'a': 'b', 'c':'c', 'd':1}}}
