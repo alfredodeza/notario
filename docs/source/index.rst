@@ -88,5 +88,3 @@ and not integer, forcing an ``Invalid`` exception:
     ...     print e
     ...
     -> foo  did not pass validation against callable: string
-
-
