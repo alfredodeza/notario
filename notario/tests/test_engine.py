@@ -213,7 +213,7 @@ class TestIterableValidator(object):
 
         assert exc.value.args[0] == 'top level has not enough items to select from'
 
-    def test_validate_nested_array(self):
+    def test_validate_nested_array_first(self):
         data = [{'a':'a'}, {'b': 'b'}]
         schema = (types.string, 'b') # note how this is not normalized
         iter_validator = engine.IterableValidator(data, schema, index=0)
