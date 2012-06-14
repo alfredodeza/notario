@@ -76,22 +76,17 @@ class BaseItemValidator(object):
     def validate(self):
         self.traverser(self.data, self.schema, self.tree)
 
+    def traverser(self, data, schema, tree):
+        if len(data) < self.index:
+            raise SchemaError(data, tree, reason="has not enough items to select from")
+        self.leaves(data, schema, tree)
+
 
 class IterableValidator(BaseItemValidator):
     """
     The iterable validator allows the definition of a single schema that can be
     run against any number of items in a given data structure
     """
-
-    def traverser(self, data, schema, tree):
-        """
-        Here there is really no need for traversing any more
-        we are running under the assumption that we are an actual
-        leaf and there is no more to recurse into.
-        """
-        if len(data) < self.index:
-            raise SchemaError(data, tree, reason="has not enough items to select from")
-        self.leaves(data, self.schema, tree)
 
     def leaf(self, index):
         self.enforce(self.data, self.schema, index, self.tree)
@@ -105,8 +100,6 @@ class IterableValidator(BaseItemValidator):
             try:
                 _validator = Validator(data[item_index], schema)
                 _validator.validate()
-                if self.index == -1: # This is how we do "any item"
-                    return
             except Invalid:
                 e = sys.exc_info()[1]
                 tree.append('list[%s]' % item_index)
@@ -125,11 +118,6 @@ class RecursiveValidator(BaseItemValidator):
     The recursive validator allows the definition of a single schema that can be
     run against any number of items in a given data structure
     """
-
-    def traverser(self, data, schema, tree):
-        if len(data) < self.index:
-            raise SchemaError(data, tree, reason="not enough items in data to select from")
-        self.leaves(data, schema, tree)
 
     def leaf(self, index):
         self.enforce(self.data, self.schema, index, self.tree)
