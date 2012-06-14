@@ -127,14 +127,23 @@ class RecursiveValidator(BaseItemValidator):
     """
 
     def traverser(self, data, schema, tree):
-        schema = normalize_schema(self.schema)
         if len(data) < self.index:
             raise SchemaError(data, tree, reason="not enough items in data to select from")
-        for index in range(self.index, len(data)):
-            _validate = Validator({}, {})
-            _validate.data = {0: data[index]}
-            _validate.schema = schema
-            _validate.validate()
+        self.leaves(data, schema, tree)
+
+    def leaf(self, index):
+        self.enforce(self.data, self.schema, index, self.tree)
+
+    def leaves(self, data, schema, tree):
+        for item_index in range(self.index, len(data)):
+            self.enforce(data, schema, item_index, tree)
+
+    def enforce(self, data, schema, item_index, tree):
+        schema = normalize_schema(self.schema)
+        _validate = Validator({}, {})
+        _validate.data = {0: data[item_index]}
+        _validate.schema = schema
+        _validate.validate()
 
 
 def normalize(data_structure, sort=True):
