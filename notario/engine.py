@@ -93,23 +93,31 @@ class IterableValidator(BaseItemValidator):
             raise SchemaError(data, tree, reason="has not enough items to select from")
         self.leaves(data, self.schema, tree)
 
+    def leaf(self, index):
+        self.enforce(self.data, self.schema, index, self.tree)
+
     def leaves(self, data, schema, tree):
         for item_index in range(self.index, len(data)):
-            if (data[item_index], dict) and isinstance(schema, tuple):
-                try:
-                    _validator = Validator(data[item_index], schema)
-                    _validator.validate()
-                except Invalid:
-                    e = sys.exc_info()[1]
-                    tree.append('list[%s]' % item_index)
-                    tree.extend(e.path)
-                    raise Invalid(e.schema_item, tree, pair='value')
-            else:
-                try:
-                    assert data[item_index] == schema
-                except AssertionError:
-                    tree.append('list[%s]' % item_index)
-                    raise Invalid(schema, tree, pair='item')
+            self.enforce(data, schema, item_index, tree)
+
+    def enforce(self, data, schema, item_index, tree):
+        if (data[item_index], dict) and isinstance(schema, tuple):
+            try:
+                _validator = Validator(data[item_index], schema)
+                _validator.validate()
+                if self.index == -1: # This is how we do "any item"
+                    return
+            except Invalid:
+                e = sys.exc_info()[1]
+                tree.append('list[%s]' % item_index)
+                tree.extend(e.path)
+                raise Invalid(e.schema_item, tree, pair='value')
+        else:
+            try:
+                assert data[item_index] == schema
+            except AssertionError:
+                tree.append('list[%s]' % item_index)
+                raise Invalid(schema, tree, pair='item')
 
 
 class RecursiveValidator(BaseItemValidator):
