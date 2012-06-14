@@ -20,7 +20,7 @@ class AnyObject(BasicRecursiveValidator):
     Grab the first object in a nested dictionary and apply the schema needed
     """
 
-    def __call__(self, data):
+    def __call__(self, data, tree):
         index = len(data) - 1
         validator = RecursiveValidator(data, self.schema, [], index=index)
         for item_index in range(len(data)):
@@ -39,6 +39,6 @@ class AllObjects(BasicRecursiveValidator):
     For all the objects contained in a dictionary apply the schema passed in.
     """
 
-    def __call__(self, data):
-        validator = RecursiveValidator(data, self.schema, [])
+    def __call__(self, data, tree):
+        validator = RecursiveValidator(data, self.schema, tree)
         validator.validate()
