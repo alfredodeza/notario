@@ -8,11 +8,12 @@ class Invalid(Exception):
     while traversing the configuration tree.
     """
 
-    def __init__(self, schema_item, path, reason=None, pair='key'):
+    def __init__(self, schema_item, path, reason=None, pair='key', msg=None):
         self.schema_item = schema_item
         self.path = path
         self._reason = reason
         self._pair = pair
+        self._msg = msg
         Exception.__init__(self, self.__str__())
 
     def __str__(self):
@@ -28,6 +29,8 @@ class Invalid(Exception):
         return message or "top level"
 
     def _format_message(self):
+        if self._msg:
+            return self._msg
         if is_callable(self.schema_item):
             msg = "did not pass validation against callable: %s" % (self.schema_item.__name__)
         else:
