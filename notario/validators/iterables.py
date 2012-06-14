@@ -28,7 +28,8 @@ class AnyItem(BasicIterableValidator):
             try:
                 return validator.leaf(item_index)
             except Invalid:
-                tree.pop()
+                if tree:
+                    tree.pop()
                 pass
 
         tree.append('list[]')
