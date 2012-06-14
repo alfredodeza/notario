@@ -29,10 +29,9 @@ class Validator(object):
             tree.append(key)
             if isinstance(value, dict):
                 self.traverser(value, svalue, tree)
-                # FIXME this probably doesn't get executed, like ever
-                # tree.pop()
             else:
                 self.leaf(data[index], schema[index], tree)
+            if tree:
                 tree.pop()
 
     def leaf(self, data, schema, tree):
