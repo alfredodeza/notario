@@ -1,3 +1,4 @@
+from notario.exceptions import Invalid
 from notario.engine import RecursiveValidator
 
 
@@ -22,7 +23,15 @@ class AnyObject(BasicRecursiveValidator):
     def __call__(self, data):
         index = len(data) - 1
         validator = RecursiveValidator(data, self.schema, [], index=index)
-        validator.validate()
+        for item_index in range(len(data)):
+            try:
+                return validator.leaf(item_index)
+            except Invalid:
+                pass
+
+        msg = "did not contain any valid objects against callable: %s" % self.__class__.__name__
+        raise Invalid(self.schema, ['{}'], pair='value', msg=msg)
+
 
 
 class AllObjects(BasicRecursiveValidator):

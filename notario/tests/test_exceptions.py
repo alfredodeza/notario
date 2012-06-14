@@ -1,11 +1,7 @@
 from notario import exceptions
 
 
-def foo():
-    """
-    Used to check on callable names
-    """
-    return True
+def foo(): return True
 
 class Object(object): pass
 
