@@ -1,3 +1,4 @@
+from notario.exceptions import Invalid
 from notario.engine import IterableValidator
 
 
@@ -22,7 +23,15 @@ class AnyItem(BasicIterableValidator):
     def __call__(self, data, tree):
         index = len(data) - 1
         validator = IterableValidator(data, self.schema, tree, index=index)
-        validator.validate()
+        for item_index in range(len(data)):
+            try:
+                return validator.leaf(item_index)
+            except Invalid:
+                pass
+
+        tree.append('list[]')
+        msg = "did not contain any valid items matching %s" % self.schema
+        raise Invalid(self.schema, tree, pair='value', msg=msg)
 
 
 class AllItems(BasicIterableValidator):

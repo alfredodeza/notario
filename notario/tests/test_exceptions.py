@@ -7,6 +7,7 @@ def foo():
     """
     return True
 
+class Object(object): pass
 
 class TestInvalid(object):
 
