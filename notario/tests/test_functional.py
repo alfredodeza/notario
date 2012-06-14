@@ -129,3 +129,44 @@ class TestWithIterableValidators(object):
             validate(data, schema)
         assert exc.value.args[0] == '-> a -> list[]  did not contain any valid items matching foo'
 
+
+class TestWithRecursiveValidators(object):
+
+    def test_all_objects_pass(self):
+        data = {'a': {'a': 1, 'b': 2, 'c': 3}}
+        schema = ('a', recursive.AllObjects((types.string, types.integer)))
+        assert validate(data, schema) is None
+
+    def test_any_objects_pass(self):
+        data = {'a': {'a': 1, 'b':'a string', 'c': 3}}
+        schema = ('a', recursive.AnyObject((types.string, types.string)))
+        assert validate(data, schema) is None
+
+    def test_all_objects_fail(self):
+        data = {'a': {'a': 1, 'b': 'a string', 'c': 3}}
+        schema = ('a', recursive.AllObjects((types.string, types.integer)))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> a -> b  did not pass validation against callable: integer'
+
+    def test_all_objects_fail_non_callable(self):
+        data = {'a': {'a': 1, 'b': 1, 'c': 1}}
+        schema = ('a', recursive.AllObjects((types.string, 2)))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> a -> a -> 1  did not match 2'
+
+    def test_any_object_fail(self):
+        data = {'a': {'a': 1, 'b': 4, 'c': 3}}
+        schema = ('a', recursive.AnyObject((types.string, types.string)))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> a  did not contain any valid objects against callable: AnyObject'
+
+    def test_any_objects_fail_non_callable(self):
+        data = {'a': {'a': 1, 'b': 4, 'c': 3}}
+        schema = ('a', recursive.AnyObject(('a', 'a')))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> a  did not contain any valid objects against callable: AnyObject'
+
