@@ -90,7 +90,7 @@ class IterableValidator(BaseItemValidator):
             self.enforce(data, schema, item_index, tree)
 
     def enforce(self, data, schema, item_index, tree):
-        if (data[item_index], dict) and isinstance(schema, tuple):
+        if isinstance(data[item_index], dict) and isinstance(schema, tuple):
             try:
                 _validator = Validator(data[item_index], schema)
                 _validator.validate()
@@ -99,6 +99,8 @@ class IterableValidator(BaseItemValidator):
                 tree.append('list[%s]' % item_index)
                 tree.extend(e.path)
                 raise Invalid(e.schema_item, tree, pair='value')
+        elif isinstance(schema, tuple) and not isinstance(data[item_index], (tuple, dict)):
+            raise SchemaError(data, tree, reason='iterable contains single items, schema does not')
         else:
             try:
                 if is_callable(schema):
