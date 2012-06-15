@@ -14,6 +14,25 @@ class TestAnyItem(object):
         msg = '-> list[]  did not contain any valid items matching 7'
         assert exc.value.args[0] == msg
 
+    def test_tuple_schemas_cannot_run_on_single_values(self):
+        data = [1, 2, 6, 4, 5]
+        schema = ('a', 'b')
+        with raises(Invalid) as exc:
+            any_item = iterables.AnyItem(schema)
+            any_item(data, [])
+        msg = "-> list[]  did not contain any valid items matching ('a', 'b')"
+        assert exc.value.args[0] == msg
+
+    def test_single_schemas_can_run_on_tuple_items(self):
+        data = [{'a':'a'}, {'b':'b'}]
+        schema = 'a'
+        with raises(Invalid) as exc:
+            any_item = iterables.AnyItem(schema)
+            any_item(data, [])
+        msg = "-> list[]  did not contain any valid items matching 'a'"
+        assert exc.value.args[0] == msg
+
+
     def test_any_item_pass(self):
         data = [1, 2, 6, 4, 5]
         schema = 6

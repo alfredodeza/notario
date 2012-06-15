@@ -127,7 +127,7 @@ class TestWithIterableValidators(object):
         schema = ('a', iterables.AnyItem('foo'))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a -> list[]  did not contain any valid items matching foo'
+        assert exc.value.args[0] == "-> a -> list[]  did not contain any valid items matching 'foo'"
 
 
 class TestWithRecursiveValidators(object):
