@@ -99,7 +99,7 @@ html_theme = 'flask_small'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'index_logo':       'notario.png',
+    'index_logo':       'notario.jpg',
     'github_fork':      'alfredodeza/notario'
 }
 
