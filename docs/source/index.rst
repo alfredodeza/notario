@@ -88,3 +88,33 @@ and not integer, forcing an ``Invalid`` exception:
     ...     print e
     ...
     -> foo  did not pass validation against callable: string
+
+Validators
+----------
+``notario`` comes with a few validators, most of them provide a low level
+validation model so you can build your own custom validators on top prividing
+you with a lot of flexibility. These are all the current validators available:
+
+* :class:`notario.validators.iterables.AllItems` : For items in an array, apply a schema to all of them.
+* :class:`notario.validators.iterables.AnyItem` : Try to get a valid item in an array against a schema
+* :class:`notario.validators.recursive.AllObjects` : For all dictionaries objects in a value pair.
+* :class:`notario.validators.recursive.AnyObject`: Try to get a valid dictionary object in a value pair.
+
+
+:mod:`notario.validators.recursive` -- Recursive Validators
+-----------------------------------------------------------
+
+.. automodule:: notario.validators.recursive
+  :members:
+
+:mod:`notario.validators.iterables` -- Iterables Validators
+-----------------------------------------------------------
+
+.. automodule:: notario.validators.iterables
+  :members:
+
+:mod:`notario.validators.types` -- Type Validators
+---------------------------------------------------
+
+.. automodule:: notario.validators.types
+  :members:
