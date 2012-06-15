@@ -22,5 +22,8 @@ Tested against:
 * Python 3.2
 * PyPy 1.5
 * PyPy 1.6
+* PyPy 1.7
+* PyPy 1.8
+* PyPy 1.9
 
 With coverage hovering at around **99%**
