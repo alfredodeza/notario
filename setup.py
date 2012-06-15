@@ -1,14 +1,9 @@
-"""
-Notario
-=======
-A simple, flexible, dictionary validator with a powerful sense
-of error reporting.
-"""
 import re
 
 
 module_file = open("notario/__init__.py").read()
 metadata = dict(re.findall("__([a-z]+)__\s*=\s*'([^']+)'", module_file))
+long_description = open('README.rst').read()
 
 from setuptools import setup
 
@@ -19,10 +14,11 @@ setup(
     author           = 'Alfredo Deza',
     author_email     = 'alfredodeza [at] gmail.com',
     version          = metadata['version'],
+    url              = 'http://github.com/alfredodeza/notario',
     license          = "MIT",
     zip_safe         = False,
     keywords         = "schema, validator, dictionary, enforce",
-    long_description = __doc__,
+    long_description = long_description,
     classifiers      = [
                         'Development Status :: 4 - Beta',
                         'Intended Audience :: Developers',
