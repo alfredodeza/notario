@@ -42,7 +42,7 @@ class AnyItem(BasicIterableValidator):
         if is_callable(self.schema):
             msg = "did not contain any valid items against callable: %s" % self.schema.__name__
         else:
-            msg = "did not contain any valid items matching %s" % self.schema
+            msg = "did not contain any valid items matching %s" % repr(self.schema)
         raise Invalid(self.schema, tree, pair='value', msg=msg)
 
 
