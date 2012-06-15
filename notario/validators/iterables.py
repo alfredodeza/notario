@@ -1,3 +1,7 @@
+"""
+Iterable validators for array objects only. They provide a way of
+applying a schema to any given items in an array.
+"""
 from notario.exceptions import Invalid
 from notario.engine import IterableValidator
 from notario.utils import is_callable
@@ -18,7 +22,9 @@ class BasicIterableValidator(object):
 
 class AnyItem(BasicIterableValidator):
     """
-    Grab the first item and apply the schema needed
+    Go over all the items in an array and make sure that at least
+    one of the items validates correctly against the schema provided.
+    If no items pass it raises ``Invalid``.
     """
 
     def __call__(self, data, tree):
