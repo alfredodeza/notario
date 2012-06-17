@@ -129,6 +129,13 @@ class TestWithIterableValidators(object):
             validate(data, schema)
         assert exc.value.args[0] == "-> a -> list[]  did not contain any valid items matching 'foo'"
 
+    def test_any_item_with_dictionaries(self):
+        data = {'a': [{'a': 1}, {'b': 2}]}
+        schema = ('a', iterables.AnyItem(('c', 4)))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == "-> a -> list[]  did not contain any valid items matching ('c', 4)"
+
 
 class TestWithRecursiveValidators(object):
 
