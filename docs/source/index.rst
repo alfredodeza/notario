@@ -21,7 +21,7 @@ pair with ``notario``:
 
 And this is how it would look when it fails:
 
-::
+.. doctest::
 
 
     >>> data = {'foo': 1}
@@ -29,7 +29,7 @@ And this is how it would look when it fails:
     >>> validate(data, schema)
     Traceback (most recent call last):
     ...
-    notario.exceptions.Invalid: -> foo -> 1  did not match bar
+    Invalid: -> foo -> 1  did not match bar
 
 
 Getting started
@@ -40,7 +40,7 @@ should meet in order to be able to allow the engine to work as expected:
 * Data to be validated is automatically **sorted alphabetically by key**
 * Schemas **must** be written matching the alphabetical order of the data to be
   validated.
-* Schemas must always be ``tuples`` as key value pairs
+* Schemas must always be ``tuples`` representing key value pairs
 * Data can contain any kind of data structure **except for tuples**.
 
 Writing schemas can get overly verbose. Consider other validators where you
@@ -82,12 +82,10 @@ and not integer, forcing an ``Invalid`` exception:
 
 
     >>> schema = (types.string, types.string)
-    >>> try:
-    ...     validate(data, schema)
-    ... except Invalid, e:
-    ...     print e
+    >>> validate(data, schema)
+    Traceback (most recent call last):
     ...
-    -> foo  did not pass validation against callable: string
+    Invalid: -> foo  did not pass validation against callable: string
 
 
 Validators
@@ -218,11 +216,10 @@ the expected value in ``'baz'`` and see what happens:
     ...                             ('baz', types.boolean)))
     ...                         )
     ...         )
-    >>> try:
-    ...    validate(data, schema)
-    ... except Invalid, e:
-    ...    print e
-    -> a -> boo -> bar  did not pass validation against callable: string
+    >>> validate(data, schema)
+    Traceback (most recent call last):
+    ... 
+    Invalid: -> a -> boo -> bar  did not pass validation against callable: string
 
 As you can see by the output, when whe changed ``'bar'`` to enforce a string
 and received a boolean, the exception message told you exactly where the
