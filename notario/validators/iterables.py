@@ -25,17 +25,49 @@ class AnyItem(BasicIterableValidator):
     Go over all the items in an array and make sure that at least
     one of the items validates correctly against the schema provided.
     If no items pass it raises ``Invalid``.
+
+    .. note:: It only works on arrays, otherwise it will raise a ``SchemaError``
+
+    .. testsetup::
+
+        from notario import validate
+        from notario.validators.iterables import AnyItem
+
+    Example usage for single values::
+
+        data = {'foo' : [10, 30, 50]}
+        schema = ('foo', AnyItem(50))
+        validate(data, schema)
+
+    Example usage for other data structures::
+
+        data = {'foo': [{'a': 1}, {'b': 2}]}
+        schema = ('foo', AnyItem(('b', 2))
+        validate(data, schema)
+
+    When a single item in the array matches correctly against the validator's schema it
+    stops further iteration and the validation passes. Otherwise it will raise an error
+    like:
+
+
+    .. doctest::
+
+        >>> data = {'foo': [{'a': 1}, {'b': 2}]}
+        >>> schema = ('foo', AnyItem(('c', 4)))
+        >>> validate(data, schema)
+        Traceback (most recent call last):
+        ...
+        Invalid: -> foo -> list[]  did not contain any valid items matching ('c', 4)
+
     """
 
     def __call__(self, data, tree):
         index = len(data) - 1
-        validator = IterableValidator(data, self.schema, tree, index=index)
+        validator = IterableValidator(data, self.schema, [], index=index)
         for item_index in range(len(data)):
             try:
                 return validator.leaf(item_index)
             except Invalid:
-                if tree:
-                    tree.pop()
                 pass
 
         tree.append('list[]')
