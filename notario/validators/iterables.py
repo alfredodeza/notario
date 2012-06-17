@@ -80,8 +80,45 @@ class AnyItem(BasicIterableValidator):
 
 class AllItems(BasicIterableValidator):
     """
-    For all the items in an array apply the schema
-    passed in
+    For all the items in an array apply the schema passed in to the validator.
+    If a single item fails, it raises ``Invalid``.
+
+    .. note:: It only works on arrays, otherwise it will raise a ``SchemaError``
+
+    .. testsetup:: allitems
+
+        from notario import validate
+        from notario.validators.iterables import AllItems
+
+    Example usage for single values::
+
+        data = {'foo' : [10, 10, 10]}
+        schema = ('foo', AllItems(10))
+        validate(data, schema)
+
+    Example usage for other data structures::
+
+        data = {'foo': [{'a': 1}, {'a': 1}]}
+        schema = ('foo', AllItems(('a', 1))
+        validate(data, schema)
+
+    When a single item in the array fails to pass against the validator's schema it
+    stops further iteration and it will raise an error like:
+
+
+    .. doctest:: allitems
+
+        >>> data = {'foo': [{'a': 1}, {'a': 2}]}
+        >>> schema = ('foo', AllItems(('a', 1)))
+        >>> validate(data, schema)
+        Traceback (most recent call last):
+        ...
+        Invalid: -> foo -> list[1] -> a -> 2  did not match 1
+
+    In this particular validator, it remembers on what index of the array the failure
+    was created and it goes even further giving the key and value of the object it
+    went against.
+
     """
 
     def __call__(self, data, tree):
