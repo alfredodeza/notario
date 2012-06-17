@@ -17,7 +17,44 @@ class BasicRecursiveValidator(object):
 
 class AnyObject(BasicRecursiveValidator):
     """
-    Grab the first object in a nested dictionary and apply the schema needed
+    Go over all the items in an dict object and make sure that at least
+    one of the items validates correctly against the schema provided.
+    If no items pass it raises ``Invalid``.
+
+
+    .. testsetup:: anyobject
+
+        from notario import validate
+        from notario.validators.recursive import AnyObject
+
+    Example usage for single values::
+
+        data = {'foo': {{'a':10}, {'b':20}, {'c':40}}}
+        schema = ('foo', AnyObject(('a', 10)))
+        validate(data, schema)
+
+    Example usage for other data structures::
+
+        data = {'foo': [{'b': 10}, {'a': 1}]}
+        schema = ('foo', AnyObject(('a', 1))
+        validate(data, schema)
+
+    When a single item in the array fails to pass against the validator's schema it
+    stops further iteration and it will raise an error like:
+
+
+    .. doctest:: anyobject
+
+        >>> data = {'foo': {'a':{'a':10}, 'b':{'a':20}, 'c':{'a':20}}}
+        >>> schema = ('foo', AnyObject(('a', ('a', 90))))
+        >>> validate(data, schema)
+        Traceback (most recent call last):
+        ...
+        Invalid: foo -> a  did not contain any valid objects against callable: AnyObject
+
+    In this particular validator, it remembers on what key of the dict object
+    the failure was created and it goes even further giving the key and value
+    of the object it went against.
     """
 
     def __call__(self, data, tree):
@@ -38,7 +75,46 @@ class AnyObject(BasicRecursiveValidator):
 
 class AllObjects(BasicRecursiveValidator):
     """
-    For all the objects contained in a dictionary apply the schema passed in.
+    For all the objects contained in a dictionary apply the schema passed in
+    to the validator.
+    If a single item object fails, it raises ``Invalid``.
+
+
+    .. testsetup:: allobjects
+
+        from notario import validate
+        from notario.validators.recursive import AllObjects
+
+    Example usage for single values::
+
+        data = {'foo': {{'a':10}, {'a':20}, {'a':20}}}
+        schema = ('foo', AllObjects(('a', 20)))
+        validate(data, schema)
+
+    Example usage for other data structures::
+
+        data = {'foo': [{'a': 1}, {'a': 1}]}
+        schema = ('foo', AllObjects(('a', 1))
+        validate(data, schema)
+
+    When a single item in the array fails to pass against the validator's schema it
+    stops further iteration and it will raise an error like:
+
+
+    .. doctest:: allobjects
+
+        >>> data = {'foo': {'a':{'a':10}, 'b':{'a':20}, 'c':{'a':20}}}
+        >>> schema = ('foo', AllObjects(('a', ('a', 90))))
+        >>> validate(data, schema)
+        Traceback (most recent call last):
+        ...
+        Invalid: -> foo -> a -> a -> 10  did not match 90
+
+    In this particular validator, it remembers on what key of the dict object
+    the failure was created and it goes even further giving the key and value
+    of the object it went against.
+
+
     """
 
     def __call__(self, data, tree):
