@@ -14,3 +14,17 @@ class TestIsCallable(object):
     def test_is_not_callable(self):
         result = utils.is_callable(1)
         assert result is False
+
+
+class TestOptionalDecorator(object):
+
+    def fake_validator(self, value):
+        return True
+
+    def test_has_no_value(self):
+        result = utils.optional(self.fake_validator)('')
+        assert result is None
+
+    def test_value(self):
+        result = utils.optional(self.fake_validator)('some value!')
+        assert result is True
