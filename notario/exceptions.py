@@ -1,12 +1,7 @@
 from notario.utils import is_callable
 
 
-class Invalid(Exception):
-    """
-    This Exception class is used only by the :class:`Validator`
-    class to provide a clear message when a validation mismatch occurs
-    while traversing the configuration tree.
-    """
+class NotarioException(Exception):
 
     def __init__(self, schema_item, path, reason=None, pair='key', msg=None):
         self.schema_item = schema_item
@@ -34,7 +29,7 @@ class Invalid(Exception):
         if is_callable(self.schema_item):
             msg = "did not pass validation against callable: %s" % (self.schema_item.__name__)
         else:
-            msg = "did not match %s" % (self.schema_item)
+            msg = "did not match %s" % (repr(self.schema_item))
         return msg
 
     def _get_message(self):
@@ -48,7 +43,16 @@ class Invalid(Exception):
             return self._reason
 
 
-class SchemaError(Invalid):
+
+class Invalid(NotarioException):
+    """
+    This Exception class is used only by the :class:`Validator`
+    class to provide a clear message when a validation mismatch occurs
+    while traversing the configuration tree.
+    """
+
+
+class SchemaError(NotarioException):
 
     def _get_message(self):
         msg = "%s %s" % (self._format_path(use_pair=False), self._reason)
