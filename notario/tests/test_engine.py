@@ -63,7 +63,7 @@ class TestValidator(object):
             validator = engine.Validator(data, schema)
             validator.validate()
 
-        assert exc.value.args[0] == '-> b key did not match c'
+        assert exc.value.args[0] == "-> b key did not match 'c'"
 
     def test_validate_length_equality(self):
         data = {'a': 1, 'b': 2}
@@ -117,7 +117,7 @@ class TestValidator(object):
             validator = engine.Validator(data, schema)
             validator.validate()
 
-        assert exc.value.args[0] == '-> b -> b -> a -> a  did not match b'
+        assert exc.value.args[0] == "-> b -> b -> a -> a  did not match 'b'"
 
     def test_validate_key_nested_dictionaries(self):
         data = {'a': 1, 'b': {'a': 2, 'b' : 1}}
@@ -126,7 +126,7 @@ class TestValidator(object):
             validator = engine.Validator(data, schema)
             validator.validate()
 
-        assert exc.value.args[0] == '-> b -> a key did not match b'
+        assert exc.value.args[0] == "-> b -> a key did not match 'b'"
 
     def test_validate_value_nested_arrays(self):
         data = {'a': 1, 'b': {'a': 2, 'b' : [1, 2, 3]}}
@@ -220,7 +220,7 @@ class TestIterableValidator(object):
         with raises(Invalid) as exc:
             iter_validator.validate()
 
-        assert exc.value.args[0] == '-> list[0] -> a -> a  did not match b'
+        assert exc.value.args[0] == "-> list[0] -> a -> a  did not match 'b'"
 
     def test_validate_nested_array(self):
         data = [{'a':'b'}, {'b': 'c'}]
@@ -229,4 +229,4 @@ class TestIterableValidator(object):
         with raises(Invalid) as exc:
             iter_validator.validate()
 
-        assert exc.value.args[0] == '-> list[1] -> b -> c  did not match b'
+        assert exc.value.args[0] == "-> list[1] -> b -> c  did not match 'b'"
