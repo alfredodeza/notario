@@ -1,6 +1,6 @@
 from pytest import raises
 from notario.validators import iterables
-from notario.exceptions import Invalid
+from notario.exceptions import Invalid, SchemaError
 
 
 class TestAnyItem(object):
@@ -17,10 +17,10 @@ class TestAnyItem(object):
     def test_tuple_schemas_cannot_run_on_single_values(self):
         data = [1, 2, 6, 4, 5]
         schema = ('a', 'b')
-        with raises(Invalid) as exc:
+        with raises(SchemaError) as exc:
             any_item = iterables.AnyItem(schema)
             any_item(data, [])
-        msg = "-> list[]  did not contain any valid items matching ('a', 'b')"
+        msg = "top level iterable contains single items, schema does not"
         assert exc.value.args[0] == msg
 
     def test_single_schemas_can_run_on_tuple_items(self):
