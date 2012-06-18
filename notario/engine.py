@@ -51,7 +51,7 @@ class Validator(object):
         try:
             data = data[index]
             schema = schema[index]
-        except KeyError:
+        except (KeyError, TypeError):
             raise SchemaError(data, tree, reason="has less items in schema than in data")
         if hasattr(schema, '__validator_leaf__'):
             return
@@ -99,6 +99,11 @@ class IterableValidator(BaseItemValidator):
                 tree.append('list[%s]' % item_index)
                 tree.extend(e.path)
                 raise Invalid(e.schema_item, tree, pair='value')
+            except SchemaError: # FIXME this is utterly redundant, and also happens in RecursiveValidator
+                e = sys.exc_info()[1]
+                tree.extend(e.path)
+                raise SchemaError('', tree, reason=e._reason, pair='value')
+
         elif isinstance(schema, tuple) and not isinstance(data[item_index], (tuple, dict)):
             raise SchemaError(data, tree, reason='iterable contains single items, schema does not')
         else:
@@ -134,6 +139,10 @@ class RecursiveValidator(BaseItemValidator):
             e = sys.exc_info()[1]
             tree.extend(e.path)
             raise Invalid(e.schema_item, tree, pair='value')
+        except SchemaError:
+            e = sys.exc_info()[1]
+            tree.extend(e.path)
+            raise SchemaError('', tree, reason=e._reason, pair='value')
 
 
 def normalize(data_structure, sort=True):
