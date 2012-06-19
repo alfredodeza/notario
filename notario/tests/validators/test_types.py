@@ -1,5 +1,4 @@
 from pytest import raises
-from notario.exceptions import Invalid
 from notario.validators import types
 
 #
