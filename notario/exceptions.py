@@ -21,7 +21,7 @@ class NotarioException(Exception):
             message += accessed_key
         if use_pair and self._pair != 'value':
             return message + self._pair
-        return message or "top level"
+        return message or "-> top level"
 
     def _format_message(self):
         if self._msg:
@@ -31,9 +31,6 @@ class NotarioException(Exception):
         else:
             msg = "did not match %s" % (repr(self.schema_item))
         return msg
-
-    def _get_message(self):
-        return "%s %s" % (self._format_path(), self._format_message())
 
     @property
     def reason(self):
@@ -50,6 +47,10 @@ class Invalid(NotarioException):
     class to provide a clear message when a validation mismatch occurs
     while traversing the configuration tree.
     """
+
+    def _get_message(self):
+        return "%s %s" % (self._format_path(), self._format_message())
+
 
 
 class SchemaError(NotarioException):
