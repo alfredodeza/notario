@@ -82,10 +82,16 @@ class IterableValidator(BaseItemValidator):
     run against any number of items in a given data structure
     """
 
+    def data_sanity(self, data):
+        if not isinstance(data, list):
+            raise SchemaError('', [], reason='IterableValidator needs a list to validate', pair='value')
+
     def leaf(self, index):
+        self.data_sanity(self.data)
         self.enforce(self.data, self.schema, index, self.tree)
 
     def leaves(self, data, schema, tree):
+        self.data_sanity(data)
         for item_index in range(self.index, len(data)):
             self.enforce(data, schema, item_index, tree)
 
