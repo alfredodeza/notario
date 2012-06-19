@@ -16,7 +16,7 @@ def optional(validator):
     As any normal decorator, it can be used corectly with the decorator
     syntax or in the actual schema.
 
-    This is how it would look in a schema:
+    This is how it would look in a schema::
 
         ('key', optional(my_validator))
 
