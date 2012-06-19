@@ -72,7 +72,7 @@ class TestValidator(object):
             validator = engine.Validator(data, schema)
             validator.validate()
 
-        assert exc.value.args[0] == 'top level length did not match schema'
+        assert exc.value.args[0] == '-> top level length did not match schema'
 
     def test_validate_length_equality_less_items(self):
         data = {'a': 1, 'b': 2, 'c':'c'}
@@ -81,7 +81,7 @@ class TestValidator(object):
             validator = engine.Validator(data, schema)
             validator.validate()
 
-        assert exc.value.args[0] == 'top level has less items in schema than in data'
+        assert exc.value.args[0] == '-> top level has less items in schema than in data'
 
     def test_validate_length_equality_returns(self):
         data = {0:('a', 1)}
@@ -190,7 +190,7 @@ class TestRecursiveValidator(object):
         with raises(SchemaError) as exc:
             recursive_validator.validate()
 
-        assert exc.value.args[0] == 'top level has not enough items to select from'
+        assert exc.value.args[0] == '-> top level has not enough items to select from'
 
     def test_deal_with_recursion(self):
         data = {'a': {'a':'a', 'b':{'a': 'b', 'c':'c', 'd':1}}}
@@ -211,7 +211,7 @@ class TestIterableValidator(object):
         with raises(SchemaError) as exc:
             iter_validator.validate()
 
-        assert exc.value.args[0] == 'top level has not enough items to select from'
+        assert exc.value.args[0] == '-> top level has not enough items to select from'
 
     def test_validate_nested_array_first(self):
         data = [{'a':'a'}, {'b': 'b'}]
@@ -230,3 +230,21 @@ class TestIterableValidator(object):
             iter_validator.validate()
 
         assert exc.value.args[0] == "-> list[1] -> b -> c  did not match 'b'"
+
+    def test_report_schema_errors(self):
+        data = [1,2,3,4]
+        schema = (types.string, ('b', 'a'))
+        iter_validator = engine.IterableValidator(data, schema, index=0)
+        with raises(SchemaError) as exc:
+            iter_validator.validate()
+
+        assert exc.value.args[0] == "-> top level iterable contains single items, schema does not"
+
+    def test_schema_error_on_non_list(self):
+        data = {'foo': [{'a':'b'}, {'b': 'c'}]}
+        schema = (types.string, 'b') # note how this is not normalized
+        iter_validator = engine.IterableValidator(data, schema, index=0)
+        with raises(SchemaError) as exc:
+            iter_validator.validate()
+
+        assert exc.value.args[0] == "-> top level IterableValidator needs a list to validate"
