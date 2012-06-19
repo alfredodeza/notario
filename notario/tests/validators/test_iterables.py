@@ -20,7 +20,7 @@ class TestAnyItem(object):
         with raises(SchemaError) as exc:
             any_item = iterables.AnyItem(schema)
             any_item(data, [])
-        msg = "top level iterable contains single items, schema does not"
+        msg = "-> top level iterable contains single items, schema does not"
         assert exc.value.args[0] == msg
 
     def test_single_schemas_can_run_on_tuple_items(self):
