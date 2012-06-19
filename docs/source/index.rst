@@ -245,3 +245,10 @@ Type Validators
 
 .. automodule:: notario.validators.types
   :members:
+
+Optional Validators
+-------------------
+
+.. module:: notario.utils
+
+.. autofunction:: optional
