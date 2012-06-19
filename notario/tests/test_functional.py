@@ -1,6 +1,6 @@
 from pytest import raises
 from notario import validate
-from notario.exceptions import Invalid
+from notario.exceptions import Invalid, SchemaError
 from notario.validators import iterables, recursive, types
 
 
@@ -107,6 +107,13 @@ class TestWithIterableValidators(object):
             validate(data, schema)
         assert exc.value.args[0] == '-> a -> list[2] item did not pass validation against callable: integer'
 
+    def test_all_items_fail_length(self):
+        data = {'a': [{'a': 2}, {'b': {'a': 'b'}}]}
+        schema = ('a', iterables.AllItems((types.string, 2)))
+        with raises(SchemaError) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> a -> b  has less items in schema than in data'
+
     def test_all_items_fail_non_callable(self):
         data = {'a': [1, 2, '3', 4, 5]}
         schema = ('a', iterables.AllItems('foo'))
@@ -162,6 +169,13 @@ class TestWithRecursiveValidators(object):
         with raises(Invalid) as exc:
             validate(data, schema)
         assert exc.value.args[0] == '-> a -> a -> 1  did not match 2'
+
+    def test_all_objects_fail_length(self):
+        data = {'a': {'a': 2, 'b': {'a': 'b'}}}
+        schema = ('a', recursive.AllObjects((types.string, 2)))
+        with raises(SchemaError) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> a -> b  has less items in schema than in data'
 
     def test_any_object_fail(self):
         data = {'a': {'a': 1, 'b': 4, 'c': 3}}
