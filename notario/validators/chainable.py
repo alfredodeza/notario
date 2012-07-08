@@ -14,14 +14,14 @@ class BasicChainValidator(object):
     pass
 
 
-class AllIn(object):
+class AllIn(BasicChainValidator):
     """
     Validates against all the validators passed in.
     """
     pass
 
 
-class AnyIn(object):
+class AnyIn(BasicChainValidator):
     """
     If any contained validator passes it skips any others
     """
