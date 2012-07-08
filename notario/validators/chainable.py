@@ -5,6 +5,15 @@ inside them and pass the value to them.
 """
 
 
+class BasicChainValidator(object):
+    """
+    The base chainable validator, should not be used directly
+    but can be sub-classed to extend into custom chainable
+    validators.
+    """
+    pass
+
+
 class AllIn(object):
     """
     Validates against all the validators passed in.
