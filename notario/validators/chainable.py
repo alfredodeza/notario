@@ -24,7 +24,6 @@ class AllIn(BasicChainValidator):
     """
     Validates against all the validators passed in.
     """
-    __name__ = 'AllIn'
 
     def __call__(self, value):
         for validator in self.args:
