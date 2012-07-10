@@ -34,6 +34,15 @@ class AllIn(BasicChainValidator):
         schema = ('foo', AllIn(types.string))
         validate(data, schema)
 
+    When more than one validator needs to be chained this validator can take it
+    in as another argument. Lets say that you have a validator that specifies
+    a minimum length a maxium length and that it starts with the letter 's'::::
+
+        data = {'foo' : "some string"}
+        schema = ('foo', AllIn(min_length, max_length, StartsWith('s'))
+        validate(data, schema)
+
+
     :raises: TypeError if the validator is *not* a callable
     """
 
