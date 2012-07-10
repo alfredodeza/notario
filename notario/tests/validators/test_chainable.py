@@ -31,3 +31,18 @@ class TestAllIn(object):
             chain("some string")
 
 
+class TestAnyIn(object):
+
+    def test_all_validators_pass(self):
+        def foo(value): pass
+        def bar(value): pass
+        chain = chainable.AnyIn(foo, bar)
+        assert chain('some value') is None
+
+    def test_no_validator_passes(self):
+        def foo(value): raise AssertionError
+        def bar(value): raise AssertionError
+        chain = chainable.AnyIn(foo, bar)
+        with raises(AssertionError) as exc:
+            chain('some value')
+        assert exc.value.args[0] == 'did not passed validation against any validator'
