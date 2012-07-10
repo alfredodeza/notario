@@ -3,7 +3,6 @@ Chainable validators are *encapsulating* validators. They
 usually will not validate per se, but can contain other validators
 inside them and pass the value to them.
 """
-from notario.exceptions import Invalid
 from notario.utils import is_callable
 
 
@@ -19,8 +18,6 @@ class BasicChainValidator(object):
             if not is_callable(i):
                 raise TypeError("got a non-callable argument: %s" % repr(i))
         self.args = args
-
-
 
 
 class AllIn(BasicChainValidator):
