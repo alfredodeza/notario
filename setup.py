@@ -5,12 +5,12 @@ module_file = open("notario/__init__.py").read()
 metadata = dict(re.findall("__([a-z]+)__\s*=\s*'([^']+)'", module_file))
 long_description = open('README.rst').read()
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name             = 'notario',
     description      = 'A dictionary validator',
-    packages         = ['notario'],
+    packages         = find_packages(),
     author           = 'Alfredo Deza',
     author_email     = 'alfredodeza [at] gmail.com',
     version          = metadata['version'],
