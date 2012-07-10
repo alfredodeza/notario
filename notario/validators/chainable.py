@@ -42,6 +42,7 @@ class AnyIn(BasicChainValidator):
         for validator in self.args:
             try:
                 return validator(value)
-            except Invalid:
+            except AssertionError:
                 pass
 
+        raise AssertionError("did not passed validation against any validator")
