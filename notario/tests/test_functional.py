@@ -237,46 +237,20 @@ class TestChainableAllIn(object):
             validate(data, schema)
         assert exc.value.args[0] == '-> a  did not pass validation against callable: AllIn'
 
+
+class TestChainableAnyIn(object):
+
     def test_all_items_fail(self):
-        data = {'a': [1, 2, '3', 4, 5]}
-        schema = ('a', iterables.AllItems(types.integer))
+        def fail(value): raise AssertionError
+        data = {'a': 'some string'}
+        schema = ('a', chainable.AnyIn(types.boolean, fail))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a -> list[2] item did not pass validation against callable: integer'
+        assert exc.value.args[0] == '-> a  did not pass validation against callable: AnyIn'
 
-    def test_all_items_fail_length(self):
-        data = {'a': [{'a': 2}, {'b': {'a': 'b'}}]}
-        schema = ('a', iterables.AllItems((types.string, 2)))
-        with raises(SchemaError) as exc:
-            validate(data, schema)
-        assert exc.value.args[0] == '-> a -> b  has less items in schema than in data'
-
-    def test_all_items_fail_non_callable(self):
-        data = {'a': [1, 2, '3', 4, 5]}
-        schema = ('a', iterables.AllItems('foo'))
-        with raises(Invalid) as exc:
-            validate(data, schema)
-        assert exc.value.args[0] == "-> a -> list[0] item did not match 'foo'"
-
-
-    def test_any_items_fail(self):
-        data = {'a': [1, 2, 3, 4, 5]}
-        schema = ('a', iterables.AnyItem(types.string))
-        with raises(Invalid) as exc:
-            validate(data, schema)
-        assert exc.value.args[0] == '-> a -> list[]  did not contain any valid items against callable: string'
-
-    def test_any_items_fail_non_callable(self):
-        data = {'a': [1, 2, 3, 4, 5]}
-        schema = ('a', iterables.AnyItem('foo'))
-        with raises(Invalid) as exc:
-            validate(data, schema)
-        assert exc.value.args[0] == "-> a -> list[]  did not contain any valid items matching 'foo'"
-
-    def test_any_item_with_dictionaries(self):
-        data = {'a': [{'a': 1}, {'b': 2}]}
-        schema = ('a', iterables.AnyItem(('c', 4)))
-        with raises(Invalid) as exc:
-            validate(data, schema)
-        assert exc.value.args[0] == "-> a -> list[]  did not contain any valid items matching ('c', 4)"
+    def test_one_item_passes(self):
+        def fail(value): raise AssertionError
+        data = {'a': 'some string'}
+        schema = ('a', chainable.AnyIn(types.string, fail))
+        assert validate(data, schema) is None
 
