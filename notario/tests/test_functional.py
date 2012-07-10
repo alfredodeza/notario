@@ -1,7 +1,7 @@
 from pytest import raises
 from notario import validate
 from notario.exceptions import Invalid, SchemaError
-from notario.validators import iterables, recursive, types
+from notario.validators import iterables, recursive, types, chainable
 
 
 class TestValidate(object):
@@ -14,7 +14,7 @@ class TestValidate(object):
             validate(data, schema)
 
         assert exc.value.args[0] == "-> a -> a  did not match 'b'"
-        
+
     def test_multi_pair_non_nested_last(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
         schema = (('a', 'a'), ('b', 'b'), ('c', 'c'), ('d', 'a'))
@@ -220,4 +220,63 @@ class TestWithRecursiveValidators(object):
         with raises(Invalid) as exc:
             validate(data, schema)
         assert exc.value.args[0] == '-> c -> list[1] item did not pass validation against callable: string'
+
+
+class TestChainableAllIn(object):
+
+    def test_all_items_pass(self):
+        starts = lambda value: True
+        data = {'a': 'some string'}
+        schema = ('a', chainable.AllIn(types.string, starts))
+        assert validate(data, schema) is None
+
+    def test_one_item_fails(self):
+        data = {'a': 'some string'}
+        schema = ('a', chainable.AllIn(types.string, types.boolean))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> a  did not pass validation against callable: AllIn'
+
+    def test_all_items_fail(self):
+        data = {'a': [1, 2, '3', 4, 5]}
+        schema = ('a', iterables.AllItems(types.integer))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> a -> list[2] item did not pass validation against callable: integer'
+
+    def test_all_items_fail_length(self):
+        data = {'a': [{'a': 2}, {'b': {'a': 'b'}}]}
+        schema = ('a', iterables.AllItems((types.string, 2)))
+        with raises(SchemaError) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> a -> b  has less items in schema than in data'
+
+    def test_all_items_fail_non_callable(self):
+        data = {'a': [1, 2, '3', 4, 5]}
+        schema = ('a', iterables.AllItems('foo'))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == "-> a -> list[0] item did not match 'foo'"
+
+
+    def test_any_items_fail(self):
+        data = {'a': [1, 2, 3, 4, 5]}
+        schema = ('a', iterables.AnyItem(types.string))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == '-> a -> list[]  did not contain any valid items against callable: string'
+
+    def test_any_items_fail_non_callable(self):
+        data = {'a': [1, 2, 3, 4, 5]}
+        schema = ('a', iterables.AnyItem('foo'))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == "-> a -> list[]  did not contain any valid items matching 'foo'"
+
+    def test_any_item_with_dictionaries(self):
+        data = {'a': [{'a': 1}, {'b': 2}]}
+        schema = ('a', iterables.AnyItem(('c', 4)))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        assert exc.value.args[0] == "-> a -> list[]  did not contain any valid items matching ('c', 4)"
 
