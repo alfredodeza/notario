@@ -235,7 +235,7 @@ class TestChainableAllIn(object):
         schema = ('a', chainable.AllIn(types.string, types.boolean))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a  did not pass validation against callable: AllIn'
+        assert exc.value.args[0] == '-> a  did not pass validation against callable: AllIn -> boolean'
 
 
 class TestChainableAnyIn(object):
@@ -253,4 +253,3 @@ class TestChainableAnyIn(object):
         data = {'a': 'some string'}
         schema = ('a', chainable.AnyIn(types.string, fail))
         assert validate(data, schema) is None
-
