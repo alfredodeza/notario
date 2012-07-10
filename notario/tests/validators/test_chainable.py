@@ -15,3 +15,12 @@ class TestBasicChainValidator(object):
         def bar(): pass
         chain = chainable.BasicChainValidator(foo, bar)
         assert chain.args == (foo, bar)
+
+
+class TestAllIn(object):
+
+    def test_all_validators_pass(self):
+        def foo(value): pass
+        def bar(value): pass
+        chain = chainable.AllIn(foo, bar)
+        assert chain('some value') is None
