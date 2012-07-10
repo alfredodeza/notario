@@ -22,7 +22,12 @@ class BasicChainValidator(object):
 
 class AllIn(BasicChainValidator):
     """
-    Validates against all the validators passed in.
+    Validates against all the validators passed in. This chainable validator
+    will pass in the actual to every single validator that is contained as an
+    argument.
+
+
+    :raises: TypeError if the validator is *not* a callable
     """
 
     def __call__(self, value):
@@ -38,6 +43,8 @@ class AllIn(BasicChainValidator):
 class AnyIn(BasicChainValidator):
     """
     If any contained validator passes it skips any others
+
+    :raises: TypeError if the validator is *not* a callable
     """
     __name__ = 'AnyIn'
 
