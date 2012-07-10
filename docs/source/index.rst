@@ -218,7 +218,7 @@ the expected value in ``'baz'`` and see what happens:
     ...         )
     >>> validate(data, schema)
     Traceback (most recent call last):
-    ... 
+    ...
     Invalid: -> a -> boo -> bar  did not pass validation against callable: string
 
 As you can see by the output, when whe changed ``'bar'`` to enforce a string
@@ -245,6 +245,13 @@ Type Validators
 
 .. automodule:: notario.validators.types
   :members:
+
+Chainable Validators
+--------------------
+
+.. automodule:: notario.validators.chainable
+  :members:
+
 
 Optional Validators
 -------------------
