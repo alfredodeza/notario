@@ -55,10 +55,12 @@ class AllIn(BasicChainValidator):
                 raise AssertionError(exc)
 
 
-
 class AnyIn(BasicChainValidator):
     """
-    If any contained validator passes it skips any others
+    If any contained validator passes it skips any others, even if those others
+    might fail at some point.  If no validators pass at the end it fails
+    pointing out that the ``AnyIn`` validator was not able to pass against any
+    contained validator.
 
     :raises: TypeError if the validator is *not* a callable
     """
