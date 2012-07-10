@@ -28,7 +28,12 @@ class AllIn(BasicChainValidator):
 
     def __call__(self, value):
         for validator in self.args:
-            validator(value)
+            try:
+                validator(value)
+            except AssertionError, exc:
+                self.__name__ = 'AllIn -> %s' % validator.__name__
+                raise AssertionError(exc)
+
 
 
 class AnyIn(BasicChainValidator):
