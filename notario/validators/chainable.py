@@ -26,6 +26,13 @@ class AllIn(BasicChainValidator):
     will pass in the actual to every single validator that is contained as an
     argument.
 
+    Example usage::
+
+        from notario.validators import types
+
+        data = {'foo' : "some string"}
+        schema = ('foo', AllIn(types.string))
+        validate(data, schema)
 
     :raises: TypeError if the validator is *not* a callable
     """
