@@ -2,9 +2,10 @@
 Basic type validators
 """
 from notario._compat import basestring
+from notario.utils import is_callable
 
 
-def string(value):
+def string(_object):
     """
     Validates a given input is of type string.
 
@@ -12,11 +13,25 @@ def string(value):
 
         data = {'a' : 21}
         schema = (string, 21)
+
+    You can also use this as a decorator, as a way to check for the
+    input before it even hits a validator you may be writing.
+
+    .. note::
+        If the argument is a callable, the decorating behavior will be
+        triggered, otherwise it will act as a normal function.  
     """
-    assert isinstance(value, basestring), "not of type string"
+    if is_callable(_object):
+        _validator = _object
+
+        def decorated(value):
+            assert isinstance(value, basestring), "not of type string"
+            return _validator(value)
+        return decorated
+    assert isinstance(_object, basestring), "not of type string"
 
 
-def boolean(value):
+def boolean(_object):
     """
     Validates a given input is of type boolean.
 
@@ -24,11 +39,26 @@ def boolean(value):
 
         data = {'a' : True}
         schema = ('a', boolean)
+
+    You can also use this as a decorator, as a way to check for the
+    input before it even hits a validator you may be writing.
+
+    .. note::
+        If the argument is a callable, the decorating behavior will be
+        triggered, otherwise it will act as a normal function.  
+
     """
-    assert isinstance(value, bool), "not of type boolean"
+    if is_callable(_object):
+        _validator = _object
+
+        def decorated(value):
+            assert isinstance(value, bool), "not of type boolean"
+            return _validator(value)
+        return decorated
+    assert isinstance(_object, bool), "not of type boolean"
 
 
-def dictionary(value):
+def dictionary(_object):
     """
     Validates a given input is of type dictionary.
 
@@ -36,11 +66,26 @@ def dictionary(value):
 
         data = {'a' : {'b': 1}}
         schema = ('a', dictionary)
+
+    You can also use this as a decorator, as a way to check for the
+    input before it even hits a validator you may be writing.
+
+    .. note::
+        If the argument is a callable, the decorating behavior will be
+        triggered, otherwise it will act as a normal function.  
+
     """
-    assert isinstance(value, dict), "not of type dictionary"
+    if is_callable(_object):
+        _validator = _object
+
+        def decorated(value):
+            assert isinstance(value, dict), "not of type dictionary"
+            return _validator(value)
+        return decorated
+    assert isinstance(_object, dict), "not of type dictionary"
 
 
-def array(value):
+def array(_object):
     """
     Validates a given input is of type list.
 
@@ -48,11 +93,26 @@ def array(value):
 
         data = {'a' : [1,2]}
         schema = ('a', array)
+
+    You can also use this as a decorator, as a way to check for the
+    input before it even hits a validator you may be writing.
+
+    .. note::
+        If the argument is a callable, the decorating behavior will be
+        triggered, otherwise it will act as a normal function.  
+
     """
-    assert isinstance(value, list), "not of type array"
+    if is_callable(_object):
+        _validator = _object
+
+        def decorated(value):
+            assert isinstance(value, list), "not of type array"
+            return _validator(value)
+        return decorated
+    assert isinstance(_object, list), "not of type array"
 
 
-def integer(value):
+def integer(_object):
     """
     Validates a given input is of type int..
 
@@ -60,5 +120,19 @@ def integer(value):
 
         data = {'a' : 21}
         schema = ('a', integer)
+
+    You can also use this as a decorator, as a way to check for the
+    input before it even hits a validator you may be writing.
+
+    .. note::
+        If the argument is a callable, the decorating behavior will be
+        triggered, otherwise it will act as a normal function.  
     """
-    assert isinstance(value, int), "not of type int"
+    if is_callable(_object):
+        _validator = _object
+
+        def decorated(value):
+            assert isinstance(_object, int), "not of type int"
+            return _validator(value)
+        return decorated
+    assert isinstance(_object, int), "not of type int"
