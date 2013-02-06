@@ -3,6 +3,7 @@ Basic type validators
 """
 from notario._compat import basestring
 
+
 def string(value):
     """
     Validates a given input is of type string.
@@ -49,6 +50,7 @@ def array(value):
         schema = ('a', array)
     """
     assert isinstance(value, list), "not of type array"
+
 
 def integer(value):
     """
