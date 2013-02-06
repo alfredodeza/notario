@@ -7,6 +7,7 @@ from notario.validators import types
 # what we expect, effectively testing python
 #
 
+
 class TestTypes(object):
 
     def test_string_pass(self):
@@ -16,35 +17,35 @@ class TestTypes(object):
         assert types.boolean(False) is None
 
     def test_dictionary_pass(self):
-        assert types.dictionary({}) is None 
+        assert types.dictionary({}) is None
 
     def test_array_pass(self):
-        assert types.array([]) is None 
+        assert types.array([]) is None
 
     def test_integer_pass(self):
-        assert types.integer(1) is None 
+        assert types.integer(1) is None
 
     def test_string_fail(self):
         with raises(AssertionError) as exc:
-            types.string(1) 
+            types.string(1)
         assert exc.value.args[0] == 'not of type string'
 
     def test_boolean_fail(self):
         with raises(AssertionError) as exc:
-            types.boolean('a string') 
+            types.boolean('a string')
         assert exc.value.args[0] == 'not of type boolean'
 
     def test_dictionary_fail(self):
         with raises(AssertionError) as exc:
-            types.dictionary([])  
+            types.dictionary([])
         assert exc.value.args[0] == 'not of type dictionary'
 
     def test_array_fail(self):
         with raises(AssertionError) as exc:
-            types.array({})  
+            types.array({})
         assert exc.value.args[0] == 'not of type array'
 
     def test_integer_fail(self):
         with raises(AssertionError) as exc:
-            types.integer('a string')  
+            types.integer('a string')
         assert exc.value.args[0] == 'not of type int'
