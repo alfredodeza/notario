@@ -19,7 +19,7 @@ def string(_object):
 
     .. note::
         If the argument is a callable, the decorating behavior will be
-        triggered, otherwise it will act as a normal function.  
+        triggered, otherwise it will act as a normal function.
     """
     if is_callable(_object):
         _validator = _object
@@ -45,7 +45,7 @@ def boolean(_object):
 
     .. note::
         If the argument is a callable, the decorating behavior will be
-        triggered, otherwise it will act as a normal function.  
+        triggered, otherwise it will act as a normal function.
 
     """
     if is_callable(_object):
@@ -72,7 +72,7 @@ def dictionary(_object):
 
     .. note::
         If the argument is a callable, the decorating behavior will be
-        triggered, otherwise it will act as a normal function.  
+        triggered, otherwise it will act as a normal function.
 
     """
     if is_callable(_object):
@@ -99,7 +99,7 @@ def array(_object):
 
     .. note::
         If the argument is a callable, the decorating behavior will be
-        triggered, otherwise it will act as a normal function.  
+        triggered, otherwise it will act as a normal function.
 
     """
     if is_callable(_object):
@@ -126,7 +126,7 @@ def integer(_object):
 
     .. note::
         If the argument is a callable, the decorating behavior will be
-        triggered, otherwise it will act as a normal function.  
+        triggered, otherwise it will act as a normal function.
     """
     if is_callable(_object):
         _validator = _object
