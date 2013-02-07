@@ -80,4 +80,3 @@ class TestNotEmpty(object):
         exc_msg = exc.value[0]
 
         assert 'is empty' in exc_msg
-

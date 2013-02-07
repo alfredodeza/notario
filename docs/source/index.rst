@@ -259,3 +259,10 @@ Optional Validators
 .. module:: notario.utils
 
 .. autofunction:: optional
+
+
+Other Decorators
+----------------
+
+.. automodule:: notario.decorators
+
