@@ -81,8 +81,8 @@ def optional(validator):
     Where ``my_validator`` can be any validator that accepts a single
     argument.
 
-    In case a class based validator is being used (like the ``recursive`` or ``iterables``
-    then it would look like::
+    In case a class based validator is being used (like the ``recursive`` or
+    ``iterables`` then it would look like::
 
         ('key', optional(class_validator(('key', 'value'))))
 
