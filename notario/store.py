@@ -6,7 +6,7 @@ from threading import local
 _state = local()
 
 
-def proxy(key):
+def _proxy(key):
     class ObjectProxy(object):
         def __getattr__(self, attr):
             obj = getattr(_state, key)
@@ -22,10 +22,16 @@ def proxy(key):
     return ObjectProxy()
 
 
-def create_storage():
-    new_storage = proxy('storage')
-    _state.storage = type('storage', (object,), {})
-    new_storage.store = {}
+def create_store():
+    """
+    A helper for setting the _proxy and slapping the store
+    object for us.
+
+    :return: A thread-local storage as a dictionary
+    """
+    new_storage = _proxy('store')
+    _state.store = type('store', (object,), {})
+    new_storage.store = dict()
     return new_storage.store
 
-storage = create_storage()
+store = create_store()

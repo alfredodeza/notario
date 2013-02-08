@@ -1,6 +1,7 @@
 import sys
 from notario.exceptions import Invalid, SchemaError
 from notario.utils import is_callable
+from notario.store import store
 
 
 class Validator(object):
