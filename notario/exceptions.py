@@ -27,7 +27,8 @@ class NotarioException(Exception):
         if self._msg:
             return self._msg
         if is_callable(self.schema_item):
-            msg = "did not pass validation against callable: %s" % (self.schema_item.__name__)
+            msg = "did not pass validation against callable: %s"\
+                  "%s"  % (self.schema_item.__name__, self.reason)
         else:
             msg = "did not match %s" % (repr(self.schema_item))
         return msg
@@ -35,9 +36,12 @@ class NotarioException(Exception):
     @property
     def reason(self):
         try:
-            return self._reason.args[0]
+            reason = self._reason.args[0]
         except IndexError:
-            return self._reason
+            reason = self._reason
+        except AttributeError:
+            return ''
+        return " (%s)" % reason
 
 
 
