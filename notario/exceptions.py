@@ -58,3 +58,11 @@ class SchemaError(NotarioException):
     def _get_message(self):
         msg = "%s %s" % (self._format_path(use_pair=False), self._reason)
         return msg
+
+
+class Skip(Exception):
+    """
+    This Exception class is used for ``optional`` decorators that fail
+    to get the right key for a given data.
+    """
+    pass
