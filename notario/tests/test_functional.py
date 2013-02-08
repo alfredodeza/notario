@@ -235,7 +235,8 @@ class TestChainableAllIn(object):
         schema = ('a', chainable.AllIn(types.string, types.boolean))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a  did not pass validation against callable: AllIn -> boolean'
+        error = exc.value.args[0]
+        assert '-> a  did not pass validation against callable: AllIn -> boolean' in error
 
 
 class TestChainableAnyIn(object):
@@ -246,7 +247,8 @@ class TestChainableAnyIn(object):
         schema = ('a', chainable.AnyIn(types.boolean, fail))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a  did not pass validation against callable: AnyIn'
+        error = exc.value.args[0]
+        assert '-> a  did not pass validation against callable: AnyIn' in error
 
     def test_one_item_passes(self):
         def fail(value): raise AssertionError

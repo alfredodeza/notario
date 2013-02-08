@@ -11,7 +11,8 @@ class TestEnforce(object):
         def bad_callable(v): assert False
         with raises(Invalid) as exc:
             engine.enforce('1', bad_callable, ['1'], 'key')
-        assert exc.value.args[0] == '-> 1 key did not pass validation against callable: bad_callable'
+        error = exc.value.args[0]
+        assert '-> 1 key did not pass validation against callable: bad_callable' in error
 
     def test_callable_passes_with_flying_colors(self):
         def cool_callable(v): pass
@@ -31,7 +32,7 @@ class TestEnforce(object):
         def callable_message(v): assert False, "this is completely False"
         with raises(Invalid) as exc:
             engine.enforce(1, callable_message, ['1'], 'key')
-        assert exc.value.reason == "this is completely False"
+        assert exc.value.reason == " (this is completely False)"
 
 
 class TestNormalizeSchema(object):
