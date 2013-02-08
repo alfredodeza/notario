@@ -1,7 +1,6 @@
 import sys
-from notario.exceptions import Invalid, SchemaError
+from notario.exceptions import Invalid, SchemaError, Skip
 from notario.utils import is_callable
-from notario.store import store
 
 
 class Validator(object):
@@ -31,7 +30,20 @@ class Validator(object):
             if isinstance(value, dict):
                 self.traverser(value, svalue, tree)
             else:
-                self.leaf(data[index], schema[index], tree)
+                # In this while loop, because we may have optional validators
+                # we can't rely on the fact that we will have a 1:1 mapping of
+                # schema/data items, so if for some reason a key in the data
+                # fails validation on an key in the schema and this key is
+                # marked as ``is_optional`` it will raise a Skip exception,
+                # telling us that we need to keep moving to the next item
+                # declared in the schema
+                while True:
+                    try_count = index
+                    try:
+                        self.leaf(data[index], schema[try_count], tree)
+                        break
+                    except Skip:
+                        try_count += 1
             if tree:
                 tree.pop()
 
@@ -43,7 +55,14 @@ class Validator(object):
         """
         key, value = data
         skey, svalue = schema
-        enforce(key, skey, tree, 'key')
+        try:
+            enforce(key, skey, tree, 'key')
+        except :
+            if hasattr(skey, 'is_optional'):
+                # then this schema is the wrong one, so let's tell our caller
+                # he needs to skip
+                raise Skip
+            raise # otherwise re-raise
         if hasattr(svalue, '__validator_leaf__'):
             return svalue(value, tree)
         enforce(value, svalue, tree, 'value')
@@ -53,7 +72,8 @@ class Validator(object):
             data = data[index]
             schema = schema[index]
         except (KeyError, TypeError):
-            raise SchemaError(data, tree, reason="has less items in schema than in data")
+            reason = "has less items in schema than in data"
+            raise SchemaError(data, tree, reason=reason)
         if hasattr(schema, '__validator_leaf__'):
             return
         if len(data) != len(schema):
@@ -73,7 +93,8 @@ class BaseItemValidator(object):
 
     def traverser(self, data, schema, tree):
         if len(data) < self.index:
-            raise SchemaError(data, tree, reason="has not enough items to select from")
+            reason = "has not enough items to select from"
+            raise SchemaError(data, tree, reason=reason)
         self.leaves(data, schema, tree)
 
 
@@ -85,7 +106,8 @@ class IterableValidator(BaseItemValidator):
 
     def data_sanity(self, data):
         if not isinstance(data, list):
-            raise SchemaError('', [], reason='IterableValidator needs a list to validate', pair='value')
+            reason = 'IterableValidator needs a list to validate'
+            raise SchemaError('', [], reason=reason, pair='value')
 
     def leaf(self, index):
         self.data_sanity(self.data)
@@ -106,7 +128,10 @@ class IterableValidator(BaseItemValidator):
                 tree.append('list[%s]' % item_index)
                 tree.extend(e.path)
                 raise Invalid(e.schema_item, tree, pair='value')
-            except SchemaError: # FIXME this is utterly redundant, and also happens in RecursiveValidator
+
+            # FIXME this is utterly redundant, and also happens in
+            # RecursiveValidator
+            except SchemaError:
                 e = sys.exc_info()[1]
                 tree.extend(e.path)
                 raise SchemaError('', tree, reason=e._reason, pair='value')
@@ -126,8 +151,8 @@ class IterableValidator(BaseItemValidator):
 
 class RecursiveValidator(BaseItemValidator):
     """
-    The recursive validator allows the definition of a single schema that can be
-    run against any number of items in a given data structure
+    The recursive validator allows the definition of a single schema that can
+    be run against any number of items in a given data structure
     """
 
     def leaf(self, index):
@@ -181,7 +206,8 @@ def normalize_schema(data_structure):
 
 
 def enforce(data_item, schema_item, tree, pair):
-    if is_callable(schema_item):
+    schema_is_optional = hasattr(schema_item, 'is_optional')
+    if is_callable(schema_item) and not schema_is_optional:
         try:
             schema_item(data_item)
         except AssertionError:
@@ -189,7 +215,10 @@ def enforce(data_item, schema_item, tree, pair):
             raise Invalid(schema_item, tree, reason=e, pair=pair)
     else:
         try:
-            assert data_item == schema_item
+            if schema_is_optional:
+                assert data_item == schema_item()
+            else:
+                assert data_item == schema_item
         except AssertionError:
             if pair == 'value':
                 tree.append(data_item)
