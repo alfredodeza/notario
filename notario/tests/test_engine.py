@@ -2,6 +2,7 @@ from pytest import raises
 from notario import engine
 from notario.exceptions import Invalid, SchemaError
 from notario.validators import recursive, iterables, types
+from notario.decorators import optional
 
 
 class TestEnforce(object):
@@ -248,3 +249,21 @@ class TestIterableValidator(object):
             iter_validator.validate()
 
         assert exc.value.args[0] == "-> top level IterableValidator needs a list to validate"
+
+
+class TestOptionalKeys(object):
+
+    def test_optional_key_passes(self):
+        data = {'a': 1, 'c': 3}
+        schema = (('a', 1), (optional('b'), 2), ('c', 3))
+        validator = engine.Validator(data, schema)
+        assert validator.validate() is None
+
+    def test_optional_key_raises(self):
+        data = {'a': 1, 'b': 3, 'c': 3}
+        schema = (('a', 1), (optional('b'), 2), ('c', 3))
+        validator = engine.Validator(data, schema)
+        with raises(Invalid) as exc:
+            validator.validate()
+        assert '3  did not match 2' in exc.value[0]
+        assert 'b -> 3' in exc.value[0]
