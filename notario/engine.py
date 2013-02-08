@@ -37,8 +37,8 @@ class Validator(object):
                 # marked as ``is_optional`` it will raise a Skip exception,
                 # telling us that we need to keep moving to the next item
                 # declared in the schema
+                try_count = index
                 while True:
-                    try_count = index
                     try:
                         self.leaf(data[index], schema[try_count], tree)
                         break
