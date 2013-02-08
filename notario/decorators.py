@@ -58,7 +58,8 @@ def not_empty(_object):
 
         @instance_of()
         def decorated(value):
-            assert value, "is empty"
+            name = getattr(value, '__name__', getattr(value.__class__, '__name__'))
+            assert value, "%s is empty" % name
             return _validator(value)
         return decorated
     assert _object, "is empty"
