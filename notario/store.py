@@ -35,3 +35,23 @@ def create_store():
     return new_storage.store
 
 store = create_store()
+
+
+#
+# Helpers
+#
+
+class new_store(object):
+
+    def __init__(self):
+        self.store = create_store()
+
+    def __enter__(self):
+        return self.store
+
+    def __exit__( self, exc_type, exc_val, exc_tb):
+        # clear the store regardless of exceptions
+        del _state.store
+        if exc_type:
+            return False
+        return True
