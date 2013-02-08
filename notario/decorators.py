@@ -64,12 +64,16 @@ def not_empty(_object):
     assert _object, "is empty"
 
 
-def optional(validator):
+def optional(_object):
     """
-    This decorator allows to have validators work only when there is
-    a value that contains some data, otherwise it will just not pass
-    the information to the actual validator and will not fail as a
-    result.
+    This decorator has a double functionality, it can wrap validators and make
+    them optional or it can wrap keys and make that entry optional.
+
+    Optional Validator:
+    -------------------
+    Allows to have validators work only when there is a value that contains
+    some data, otherwise it will just not pass the information to the actual
+    validator and will not fail as a result.
 
     As any normal decorator, it can be used corectly with the decorator
     syntax or in the actual schema.
@@ -88,12 +92,37 @@ def optional(validator):
 
     Of course, the schema should vary depending on your needs, it is just the
     way of constructing the validator call that should be important.
+
+    Optional Keys:
+    --------------
+    Sometimes a given data structure may present optional entries. For example
+    this data::
+
+        data = {'required': 1, 'optional': 2}
+
+    To represent this, you will need to declare the `optional` key in the
+    schema but by wrapping the key with this decorator you will basically tell
+    the validation engine that if that key is present it should be validated,
+    otherwise, it should be skipped. This is how the schema would look::
+
+        schema = (('required', 1), (optional('optional'), 1))
+
+    The above schema would allow data that is missing the ``optional`` key. The
+    data below would pass validation without any issues::
+
+        data = {'required': 1}
     """
+    if is_callable(_object):
+        validator = _object
 
-    def decorated(value):
-        if value:
-            return validator(value)
-        return
+        def decorated(value):
+            if value:
+                return validator(value)
+            return
 
-    return decorated
-
+        return decorated
+    else:
+        def wrapped(*args):
+            return _object
+        wrapped.is_optional = True
+        return wrapped
