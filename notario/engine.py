@@ -220,9 +220,10 @@ def enforce(data_item, schema_item, tree, pair):
             else:
                 assert data_item == schema_item
         except AssertionError:
+            e = sys.exc_info()[1]
             if pair == 'value':
                 tree.append(data_item)
-            raise Invalid(schema_item, tree, pair=pair)
+            raise Invalid(schema_item, tree, reason=e, pair=pair)
 
 
 def validate(data, schema):
