@@ -180,5 +180,3 @@ class TestTypesDelegating(object):
         with raises(AssertionError) as exc:
             validate(3)
         assert exc.value.args[0] == 'too big'
-
-
