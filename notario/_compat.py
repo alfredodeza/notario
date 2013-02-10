@@ -4,7 +4,7 @@ on the same source
 """
 import sys
 
-if sys.version_info >= (3, 0):
+if sys.version_info >= (3, 0): # pragma: no cover
     basestring = str
 else:
     basestring = basestring

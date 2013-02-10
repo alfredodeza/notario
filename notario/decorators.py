@@ -1,4 +1,4 @@
-from notario.utils import is_callable
+from notario.utils import is_callable, safe_repr
 
 
 class instance_of(object):
@@ -37,15 +37,8 @@ class instance_of(object):
         return decorated
 
     def valid_names(self):
-        return [self._safe_repr(obj)
+        return [safe_repr(obj)
                 for obj in self.valid_types]
-
-    def _safe_repr(self, obj):
-        try:
-            name = getattr(obj, '__name__', getattr(obj.__class__, '__name__'))
-            return name
-        except AttributeError:
-            return repr(obj)
 
 
 def not_empty(_object):
@@ -58,8 +51,7 @@ def not_empty(_object):
 
         @instance_of()
         def decorated(value):
-            name = getattr(value, '__name__', getattr(value.__class__, '__name__'))
-            assert value, "%s is empty" % name
+            assert value, "%s is empty" % safe_repr(value)
             return _validator(value)
         return decorated
     assert _object, "is empty"

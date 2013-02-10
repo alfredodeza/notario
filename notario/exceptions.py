@@ -28,7 +28,7 @@ class NotarioException(Exception):
             return self._msg
         if is_callable(self.schema_item):
             msg = "did not pass validation against callable: %s"\
-                  "%s"  % (self.schema_item.__name__, self.reason)
+                  "%s" % (self.schema_item.__name__, self.reason)
         else:
             msg = "did not match %s" % (repr(self.schema_item))
         return msg
@@ -44,7 +44,6 @@ class NotarioException(Exception):
         return " (%s)" % reason
 
 
-
 class Invalid(NotarioException):
     """
     This Exception class is used only by the :class:`Validator`
@@ -54,7 +53,6 @@ class Invalid(NotarioException):
 
     def _get_message(self):
         return "%s %s" % (self._format_path(), self._format_message())
-
 
 
 class SchemaError(NotarioException):
