@@ -49,7 +49,7 @@ class TestTypes(object):
         with raises(AssertionError) as exc:
             types.integer('a string')
         assert exc.value.args[0] == 'not of type int'
-        
+
 
 class TestTypesAsDecorators(object):
 
@@ -65,33 +65,33 @@ class TestTypesAsDecorators(object):
         def validate(value):
             assert value is False
 
-        assert types.boolean(False) is None
+        assert validate(False) is None
 
     def test_dictionary_pass(self):
         @types.dictionary
         def validate(value):
             assert value == {}
 
-        assert types.dictionary({}) is None
+        assert validate({}) is None
 
     def test_array_pass(self):
         @types.array
         def validate(value):
             assert value == []
 
-        assert types.array([]) is None
+        assert validate([]) is None
 
     def test_integer_pass(self):
         @types.integer
         def validate(value):
             assert value == 1
 
-        assert types.integer(1) is None
+        assert validate(1) is None
 
     def test_string_fail(self):
         @types.string
         def validate(value):
-            assert value == 'a string'
+            assert value == 'a string' # pragma: no cover
 
         with raises(AssertionError) as exc:
             validate(1)
@@ -100,8 +100,8 @@ class TestTypesAsDecorators(object):
     def test_boolean_fail(self):
         @types.boolean
         def validate(value):
-            assert value is False
-        
+            assert value is False # pragma: no cover
+
         with raises(AssertionError) as exc:
             validate('a string')
         assert exc.value.args[0] == 'not of type boolean'
@@ -109,8 +109,8 @@ class TestTypesAsDecorators(object):
     def test_dictionary_fail(self):
         @types.dictionary
         def validate(value):
-            assert value == {}
-        
+            assert value == {} # pragma: no cover
+
         with raises(AssertionError) as exc:
             validate([])
         assert exc.value.args[0] == 'not of type dictionary'
@@ -118,8 +118,8 @@ class TestTypesAsDecorators(object):
     def test_array_fail(self):
         @types.array
         def validate(value):
-            assert value is False
-        
+            assert value is False # pragma: no cover
+
         with raises(AssertionError) as exc:
             validate({})
         assert exc.value.args[0] == 'not of type array'
@@ -127,9 +127,58 @@ class TestTypesAsDecorators(object):
     def test_integer_fail(self):
         @types.integer
         def validate(value):
-            assert value == 1
+            assert value == 1 # pragma: no cover
 
         with raises(AssertionError) as exc:
             validate('a string')
         assert exc.value.args[0] == 'not of type int'
-    
+
+
+class TestTypesDelegating(object):
+
+    def test_string_decorated(self):
+        @types.string
+        def validate(value):
+            assert len(value) == 1, 'too long'
+
+        with raises(AssertionError) as exc:
+            validate('123')
+        assert exc.value.args[0] == 'too long'
+
+    def test_boolean_decorated(self):
+        @types.boolean
+        def validate(value):
+            assert value is False, 'not false'
+
+        with raises(AssertionError) as exc:
+            validate(True)
+        assert exc.value.args[0] == 'not false'
+
+    def test_dictionary_decorated(self):
+        @types.dictionary
+        def validate(value):
+            assert len(value) == 1, 'too long'
+
+        with raises(AssertionError) as exc:
+            validate({'a': 1, 'b': 2})
+        assert exc.value.args[0] == 'too long'
+
+    def test_array_decorated(self):
+        @types.array
+        def validate(value):
+            assert len(value) == 1, 'too long'
+
+        with raises(AssertionError) as exc:
+            validate([1, 2])
+        assert exc.value.args[0] == 'too long'
+
+    def test_integer_fail(self):
+        @types.integer
+        def validate(value):
+            assert value == 1, 'too big'
+
+        with raises(AssertionError) as exc:
+            validate(3)
+        assert exc.value.args[0] == 'too big'
+
+
