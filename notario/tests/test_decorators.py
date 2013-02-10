@@ -7,7 +7,7 @@ class TestInstanceOf(object):
     def test_not_of_any_valid_types(self):
         @decorators.instance_of()
         def validator(value):
-            assert True
+            assert True  # pragma: no cover
 
         with raises(AssertionError) as exc:
             validator(0)
@@ -21,7 +21,7 @@ class TestInstanceOf(object):
     def test_custom_valid_types(self):
         @decorators.instance_of((str,))
         def validator(value):
-            assert True
+            assert True # pragma: no cover
 
         with raises(AssertionError) as exc:
             validator({})
@@ -36,7 +36,7 @@ class TestInstanceOf(object):
 
         @decorators.instance_of((Foo,))
         def validator(value):
-            assert True
+            assert True # pragma: no cover
 
         with raises(AssertionError) as exc:
             validator({})
@@ -51,7 +51,7 @@ class TestNotEmpty(object):
     def test_not_empty_dict(self):
         @decorators.not_empty
         def validator(value):
-            assert len(value)
+            assert len(value) # pragma: no cover
 
         with raises(AssertionError) as exc:
             validator({})
@@ -62,7 +62,7 @@ class TestNotEmpty(object):
     def test_not_empty_str(self):
         @decorators.not_empty
         def validator(value):
-            assert len(value)
+            assert len(value) # pragma: no cover
 
         with raises(AssertionError) as exc:
             validator("")
@@ -73,7 +73,7 @@ class TestNotEmpty(object):
     def test_not_empty_list(self):
         @decorators.not_empty
         def validator(value):
-            assert len(value)
+            assert len(value) # pragma: no cover
 
         with raises(AssertionError) as exc:
             validator([])
