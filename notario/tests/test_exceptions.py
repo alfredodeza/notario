@@ -5,6 +5,7 @@ def foo(): return True
 
 class Object(object): pass
 
+
 class TestInvalid(object):
 
     def test_include_the_key(self):
@@ -42,3 +43,17 @@ class TestInvalid(object):
         error = exceptions.Invalid(foo, ['foo', 'bar', 'baz'], pair='value')
         result = error.__str__()
         assert "-> foo -> bar -> baz  did not pass validation against callable: foo" == result
+
+
+
+class TestSchemaError(object):
+
+    def test_reason_has_no_args(self):
+        class Foo(object):
+            def __repr__(self):
+                return "some reason"
+        reason = Foo()
+        reason.args = []
+        error = exceptions.SchemaError(foo, ['foo'], reason=reason, pair='value')
+        result = error.reason
+        assert " (some reason)" == result
