@@ -132,7 +132,7 @@ def integer(_object):
         _validator = _object
 
         def decorated(value):
-            assert isinstance(_object, int), "not of type int"
+            assert isinstance(value, int), "not of type int"
             return _validator(value)
         return decorated
     assert isinstance(_object, int), "not of type int"
