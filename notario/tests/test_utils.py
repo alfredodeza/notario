@@ -4,8 +4,7 @@ from notario import utils
 class TestIsCallable(object):
 
     def setup(self):
-        def fake_callable():
-            pass
+        def fake_callable(): pass
         self.fake_callable = fake_callable
 
     def test_is_callable(self):
