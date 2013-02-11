@@ -105,7 +105,9 @@ class TestWithIterableValidators(object):
         schema = ('a', iterables.AllItems(types.integer))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a -> list[2] item did not pass validation against callable: integer'
+        error = exc.value.args[0]
+        assert 'not of type int' in error
+        assert '-> a -> list[2] item did not pass validation against callable: integer' in error
 
     def test_all_items_fail_length(self):
         data = {'a': [{'a': 2}, {'b': {'a': 'b'}}]}
@@ -219,7 +221,9 @@ class TestWithRecursiveValidators(object):
             )
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> c -> list[1] item did not pass validation against callable: string'
+        error = exc.value.args[0]
+        assert 'not of type string' in error
+        assert '-> c -> list[1] item did not pass validation against callable: string' in error
 
 
 class TestChainableAllIn(object):
