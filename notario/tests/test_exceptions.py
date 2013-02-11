@@ -55,5 +55,4 @@ class TestSchemaError(object):
         reason = Foo()
         reason.args = []
         error = exceptions.SchemaError(foo, ['foo'], reason=reason, pair='value')
-        result = error.reason
-        assert " (some reason)" == result
+        assert "some reason" == repr(error.reason)
