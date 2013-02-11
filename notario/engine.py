@@ -1,6 +1,6 @@
 import sys
 from notario.exceptions import Invalid, SchemaError, Skip
-from notario.utils import is_callable
+from notario.utils import is_callable, ndict, sift
 
 
 class Validator(object):
@@ -21,6 +21,12 @@ class Validator(object):
         """
         if hasattr(schema, '__validator_leaf__'):
             return schema(data, tree)
+
+        if hasattr(schema, 'must_validate'):  # cherry picking?
+            if not len(schema.must_validate):
+                reason = "must_validate attribute must not be empty"
+                raise SchemaError(data, tree, reason=reason)
+            data = sift(data, schema.must_validate)
 
         for index in range(len(data)):
             self.length_equality(data, schema, index, tree)
@@ -57,12 +63,12 @@ class Validator(object):
         skey, svalue = schema
         try:
             enforce(key, skey, tree, 'key')
-        except :
+        except Invalid:
             if hasattr(skey, 'is_optional'):
                 # then this schema is the wrong one, so let's tell our caller
                 # he needs to skip
                 raise Skip
-            raise # otherwise re-raise
+            raise  # otherwise re-raise
         if hasattr(svalue, '__validator_leaf__'):
             return svalue(value, tree)
         enforce(value, svalue, tree, 'value')
@@ -72,8 +78,9 @@ class Validator(object):
             data = data[index]
             schema = schema[index]
         except (KeyError, TypeError):
-            reason = "has less items in schema than in data"
-            raise SchemaError(data, tree, reason=reason)
+            if not hasattr(schema, 'must_validate'):
+                reason = "has less items in schema than in data"
+                raise SchemaError(data, tree, reason=reason)
         if hasattr(schema, '__validator_leaf__'):
             return
         if len(data) != len(schema):
@@ -194,16 +201,21 @@ def normalize(data_structure, sort=True):
 def normalize_schema(data_structure):
     if len(data_structure) == 2 and isinstance(data_structure[1], tuple) or len(data_structure) > 2:
         if not isinstance(data_structure[0], tuple):
-            new_struct = {0: (data_structure[0], normalize_schema(data_structure[1]))}
+            new_struct = ndict({0: (data_structure[0], normalize_schema(data_structure[1]))})
         else:
-            new_struct = dict((number, value) for number, value in enumerate(data_structure))
+            new_struct = ndict((number, value) for number, value in enumerate(data_structure))
         for i in range(len(new_struct)):
             value = new_struct.get(i)
-            if len(value) == 2 and isinstance(value[1], tuple): # a nested tuple
+            if len(value) == 2 and isinstance(value[1], tuple): # nested tuple
                 new_struct[i] = (value[0], normalize_schema(value[1]))
+        if hasattr(data_structure, 'must_validate'):
+            new_struct.must_validate = data_structure.must_validate
         return new_struct
     else:
-        return {0: data_structure}
+        new_struct = ndict({0: data_structure})
+        if hasattr(data_structure, 'must_validate'):
+            new_struct.must_validate = data_structure.must_validate
+        return new_struct
 
 
 def enforce(data_item, schema_item, tree, pair):
