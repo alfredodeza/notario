@@ -22,7 +22,6 @@ class cherry_pick(tuple):
         try:
             self.must_validate = tuple([key for key, value in _tuple])
         except ValueError:  # single k/v pair
-            self.must_validate = (_tuple[0])
-        except TypeError:  # maybe not k, v pairs
-            pass
+            if len(_tuple) == 2:
+                self.must_validate = tuple(_tuple[0])
         return super(cherry_pick, self).__init__()

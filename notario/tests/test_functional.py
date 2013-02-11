@@ -108,6 +108,18 @@ class TestCherryPick(object):
         # should not raise invalid, because 'c' never got validated
         assert validate(data, schema) is None
 
+    def test_complain_about_empty_must_validate(self):
+        data = {'a': {'b': 'b', 'c': 'c', 'd': 'd'}}
+        picky = cherry_pick((('b' ,'b'), ('c', 'd')))
+        picky.must_validate = ()
+        schema = ('a', picky)
+
+        # should not raise invalid, because 'c' never got validated
+        with raises(SchemaError) as exc:
+            validate(data, schema)
+
+        assert exc.value.args[0] == "-> a  must_validate attribute must not be empty"
+
 
 class TestWithIterableValidators(object):
 
