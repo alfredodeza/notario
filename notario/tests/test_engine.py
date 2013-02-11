@@ -32,7 +32,7 @@ class TestEnforce(object):
         def callable_message(v): assert False, "this is completely False"
         with raises(Invalid) as exc:
             engine.enforce(1, callable_message, ['1'], 'key')
-        assert exc.value.reason == " (this is completely False)"
+        assert exc.value.reason == "this is completely False"
 
 
 class TestNormalizeSchema(object):
