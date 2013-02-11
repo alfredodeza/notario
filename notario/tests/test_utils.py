@@ -1,3 +1,4 @@
+from notario.engine import normalize
 from notario import utils
 
 
@@ -36,3 +37,24 @@ class TestOptionalDecorator(object):
     def test_value_has_string(self):
         result = utils.optional('value')
         assert result() == 'value'
+
+
+class TestSift(object):
+
+    def test_no_required_items(self):
+        data = normalize({'a': 1, 'b': 2})
+        result = utils.sift(data)
+        assert result == {}
+
+    def test_get_one_item_back(self):
+        data = normalize({'a': 1, 'b': 2})
+        result = utils.sift(data, ['b'])
+        assert result == {0: ('b', 2)}
+
+
+class TestReSort(object):
+
+    def test_keys_will_reset_to_zero(self):
+        data = {16: ('a', 1), 4: ('b', 1), 3: ('a',1)}
+        result = utils.re_sort(data)
+        assert result == {0: ('a', 1), 1: ('b', 1), 2: ('a', 1)}
