@@ -145,8 +145,9 @@ class IterableValidator(BaseItemValidator):
                 else:
                     assert data[item_index] == schema
             except AssertionError:
+                reason = sys.exc_info()[1]
                 tree.append('list[%s]' % item_index)
-                raise Invalid(schema, tree, pair='item')
+                raise Invalid(schema, tree, reason=reason, pair='item')
 
 
 class RecursiveValidator(BaseItemValidator):
