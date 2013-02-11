@@ -1,7 +1,7 @@
 from pytest import raises
 from notario import validate
 from notario.exceptions import Invalid, SchemaError
-from notario.validators import iterables, recursive, types, chainable
+from notario.validators import iterables, recursive, types, chainable, cherry_pick
 
 
 class TestValidate(object):
@@ -86,6 +86,27 @@ class TestValidate(object):
             validate(data, schema)
 
         assert exc.value.args[0] == "-> c key did not match 'f'"
+
+
+class TestCherryPick(object):
+
+    def test_validate_only_one_item(self):
+        data = {'a': {'b': 'b', 'c': 'c', 'd': 'd'}}
+        schema = ('a', cherry_pick(('b', 'a')))
+
+        with raises(Invalid) as exc:
+            validate(data, schema)
+
+        assert exc.value.args[0] == "-> a -> b -> b  did not match 'a'"
+
+    def test_validate_custom_items(self):
+        data = {'a': {'b': 'b', 'c': 'c', 'd': 'd'}}
+        picky = cherry_pick((('b' ,'b'), ('c', 'd')))
+        picky.must_validate = ('b',)
+        schema = ('a', picky)
+
+        # should not raise invalid, because 'c' never got validated
+        assert validate(data, schema) is None
 
 
 class TestWithIterableValidators(object):
