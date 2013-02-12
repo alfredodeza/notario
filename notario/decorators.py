@@ -58,8 +58,11 @@ class instance_of(object):
 
 def not_empty(_object):
     """
-    Validates the a given input (has to be a valid data structure) is empty.
+    Validates the given input (has to be a valid data structure) is empty.
     Input *has* to be one of: `list`, `dict`, or `string`.
+
+    It is specially useful when most of the validators being created are
+    dealing with data structures that should not be empty.
     """
     if is_callable(_object):
         _validator = _object
@@ -69,7 +72,10 @@ def not_empty(_object):
             assert value, "%s is empty" % safe_repr(value)
             return _validator(value)
         return decorated
-    assert _object, "is empty"
+    try:
+        assert len(_object), "%s is empty" % safe_repr(_object)
+    except TypeError:
+        raise AssertionError("not of any valid types: [list, dict, str]")
 
 
 def optional(_object):
@@ -131,4 +137,5 @@ def optional(_object):
         def wrapped(*args):
             return _object
         wrapped.is_optional = True
+        wrapped._object = _object
         return wrapped
