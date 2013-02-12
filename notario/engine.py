@@ -1,13 +1,16 @@
 import sys
 from notario.exceptions import Invalid, SchemaError
 from notario.utils import is_callable, ndict, sift, is_empty, re_sort
+from notario.normal import Data, Schema
 
 
 class Validator(object):
 
     def __init__(self, data, schema):
-        self.data = normalize(data)
-        self.schema = normalize_schema(schema)
+        self.data = Data(data, schema).normalized()
+        self.schema = Schema(data, schema).normalized()
+        #self.data = normalize(data)
+        #self.schema = normalize_schema(schema)
 
     def validate(self):
         self.length_equality(self.data, self.schema, 0, [])
@@ -120,7 +123,8 @@ class IterableValidator(BaseItemValidator):
 
     def data_sanity(self, data, tree=None):
         if not isinstance(data, list):
-            reason = '%s needs a list to validate' % self.name or 'IterableValidator'
+            name = self.name or 'IterableValidator'
+            reason = '%s needs a list to validate' % name
             raise SchemaError('', tree or [], reason=reason, pair='value')
 
     def leaf(self, index):
