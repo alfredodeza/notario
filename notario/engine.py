@@ -93,14 +93,14 @@ class Validator(object):
         return re_sort(schema)
 
 
-
 class BaseItemValidator(object):
 
-    def __init__(self, data, schema, tree=None, index=None):
+    def __init__(self, data, schema, tree=None, index=None, name=None):
         self.data = data
         self.schema = schema
         self.tree = tree or []
         self.index = index or 0
+        self.name = name
 
     def validate(self):
         self.traverser(self.data, self.schema, self.tree)
@@ -118,17 +118,17 @@ class IterableValidator(BaseItemValidator):
     run against any number of items in a given data structure
     """
 
-    def data_sanity(self, data):
+    def data_sanity(self, data, tree=None):
         if not isinstance(data, list):
-            reason = 'IterableValidator needs a list to validate'
-            raise SchemaError('', [], reason=reason, pair='value')
+            reason = '%s needs a list to validate' % self.name or 'IterableValidator'
+            raise SchemaError('', tree or [], reason=reason, pair='value')
 
     def leaf(self, index):
-        self.data_sanity(self.data)
+        self.data_sanity(self.data, tree=self.tree)
         self.enforce(self.data, self.schema, index, self.tree)
 
     def leaves(self, data, schema, tree):
-        self.data_sanity(data)
+        self.data_sanity(data, tree=tree)
         for item_index in range(self.index, len(data)):
             self.enforce(data, schema, item_index, tree)
 
