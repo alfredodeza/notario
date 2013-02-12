@@ -265,4 +265,5 @@ Other Decorators
 ----------------
 
 .. automodule:: notario.decorators
+  :members:
 
