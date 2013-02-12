@@ -64,3 +64,10 @@ def sift(data, required_items=None):
         if v[0] in required_items:
             new_data[k] = v
     return re_sort(new_data)
+
+
+def is_empty(value):
+    try:
+        return len(value) == 0
+    except TypeError:
+        return False
