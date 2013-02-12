@@ -26,7 +26,8 @@ class AnyItem(BasicIterableValidator):
     one of the items validates correctly against the schema provided.
     If no items pass it raises ``Invalid``.
 
-    .. note:: It only works on arrays, otherwise it will raise a ``SchemaError``
+    .. note::
+        It only works on arrays, otherwise it will raise a ``SchemaError``
 
     .. testsetup::
 
@@ -45,9 +46,9 @@ class AnyItem(BasicIterableValidator):
         schema = ('foo', AnyItem(('b', 2))
         validate(data, schema)
 
-    When a single item in the array matches correctly against the validator's schema it
-    stops further iteration and the validation passes. Otherwise it will raise an error
-    like:
+    When a single item in the array matches correctly against the validator's
+    schema it stops further iteration and the validation passes. Otherwise it
+    will raise an error like:
 
 
     .. doctest::
@@ -63,7 +64,7 @@ class AnyItem(BasicIterableValidator):
 
     def __call__(self, data, tree):
         index = len(data) - 1
-        validator = IterableValidator(data, self.schema, [], index=index)
+        validator = IterableValidator(data, self.schema, [], index=index, name='AnyItem')
         for item_index in range(len(data)):
             try:
                 return validator.leaf(item_index)
@@ -122,5 +123,5 @@ class AllItems(BasicIterableValidator):
     """
 
     def __call__(self, data, tree):
-        validator = IterableValidator(data, self.schema, tree)
+        validator = IterableValidator(data, self.schema, tree, name='AllItems')
         validator.validate()
