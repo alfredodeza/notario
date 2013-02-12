@@ -35,28 +35,6 @@ class TestEnforce(object):
         assert exc.value.reason == "this is completely False"
 
 
-class TestNormalizeSchema(object):
-
-    def test_return_data_structure_with_cero_index(self):
-        result = engine.normalize_schema(['a'])
-        assert result == {0: ['a']}
-
-    def test_recurse_if_second_item_is_typle(self):
-        data = ('a', ('a', 'b'))
-        result = engine.normalize_schema(data)
-        assert result == {0: ('a', {0: ('a', 'b')})}
-
-    def test_respect_more_than_two_values_in_tuple(self):
-        data = ('a', (('a', 'b'), ('c', 'c'), ('d', 'd')))
-        result = engine.normalize_schema(data)
-        assert result == {0: ('a', {0: ('a', 'b'), 1: ('c', 'c'), 2: ('d', 'd')})}
-
-    def test_basic_key_value_pairs(self):
-        data = (('a', 'b'), ('b', 'b'), ('c', 'c'))
-        result = engine.normalize_schema(data)
-        assert result == {0: ('a', 'b'), 1: ('b', 'b'), 2: ('c', 'c')}
-
-
 class TestValidator(object):
 
     def test_validate_top_level_keys(self):
@@ -196,14 +174,14 @@ class TestRecursiveValidator(object):
         assert exc.value.args[0] == '-> top level has not enough items to select from'
 
     def test_deal_with_recursion(self):
-        data = {'a': {'a':'a', 'b':{'a': 'b', 'c':'c', 'd':1}}}
+        data = {'a': {'a': 'a', 'b': {'a': 'b', 'c': 'c', 'd': 1}}}
         schema = ('a', (('a', 'a'), ('b', recursive.AllObjects((types.string, types.string)))))
         with raises(Invalid) as exc:
             validator = engine.Validator(data, schema)
             validator.validate()
 
         error = exc.value.args[0]
-        assert '-> a -> b -> d  did not pass validation against callable: string' in error
+        assert 'd  did not pass validation against callable: string' in error
         assert 'not of type string' in error
 
 
@@ -215,8 +193,8 @@ class TestIterableValidator(object):
         iter_validator = engine.IterableValidator(data, schema, index=100)
         with raises(SchemaError) as exc:
             iter_validator.validate()
-
-        assert exc.value.args[0] == '-> top level has not enough items to select from'
+        error = exc.value.args[0]
+        assert '-> top level has not enough items to select from' in error
 
     def test_validate_nested_array_first(self):
         data = [{'a':'a'}, {'b': 'b'}]
@@ -242,8 +220,8 @@ class TestIterableValidator(object):
         iter_validator = engine.IterableValidator(data, schema, index=0)
         with raises(SchemaError) as exc:
             iter_validator.validate()
-
-        assert exc.value.args[0] == "-> top level iterable contains single items, schema does not"
+        error = exc.value.args[0]
+        assert "iterable contains single items, schema does not" in error
 
     def test_schema_error_on_non_list(self):
         data = {'foo': [{'a':'b'}, {'b': 'c'}]}
@@ -251,8 +229,8 @@ class TestIterableValidator(object):
         iter_validator = engine.IterableValidator(data, schema, index=0)
         with raises(SchemaError) as exc:
             iter_validator.validate()
-
-        assert exc.value.args[0] == "-> top level IterableValidator needs a list to validate"
+        error = exc.value.args[0]
+        assert "top level IterableValidator needs a list to validate" in error
 
 
 class TestOptionalKeys(object):

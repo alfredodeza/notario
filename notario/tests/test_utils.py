@@ -1,4 +1,4 @@
-from notario.engine import normalize
+from notario.normal import Data
 from notario import utils
 
 
@@ -42,12 +42,13 @@ class TestOptionalDecorator(object):
 class TestSift(object):
 
     def test_no_required_items(self):
-        data = normalize({'a': 1, 'b': 2})
+        data = Data({'a': 1, 'b': 2}, {}).normalized()
         result = utils.sift(data)
         assert result == {}
 
     def test_get_one_item_back(self):
-        data = normalize({'a': 1, 'b': 2})
+
+        data = Data({'a': 1, 'b': 2}, {}).normalized()
         result = utils.sift(data, ['b'])
         assert result == {0: ('b', 2)}
 
@@ -58,6 +59,17 @@ class TestReSort(object):
         data = {16: ('a', 1), 4: ('b', 1), 3: ('a',1)}
         result = utils.re_sort(data)
         assert result == {0: ('a', 1), 1: ('b', 1), 2: ('a', 1)}
+
+
+class TestIsEmpty(object):
+
+    def test_not_any_valid_structure_is_false(self):
+        result = utils.is_empty(False)
+        assert result is False
+
+    def test_valid_structures_are_false_when_empty(self):
+        for structure in [[], {}, '']:
+            assert utils.is_empty(structure) is True
 
 
 class TestIsNestedTuple(object):
