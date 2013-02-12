@@ -73,7 +73,6 @@ class Validator(object):
             raise SchemaError(data, tree, reason='length did not match schema')
 
     def sanitize_optionals(self, data, schema, tree):
-        data_keys = [v[0] for k, v in data.items()]
         schema_key_map = {}
         try:
             for number, value in schema.items():
@@ -89,6 +88,8 @@ class Validator(object):
                     optional_keys[k] = key
             except AttributeError:
                 pass
+
+        data_keys = [v[0] for k, v in data.items()]
 
         for number, value in optional_keys.items():
             if value not in data_keys:
@@ -145,7 +146,7 @@ class IterableValidator(BaseItemValidator):
                 e = sys.exc_info()[1]
                 tree.append('list[%s]' % item_index)
                 tree.extend(e.path)
-                raise Invalid(e.schema_item, tree, pair='value')
+                raise Invalid(e.schema_item, tree, reason=e._reason, pair='value')
 
             # FIXME this is utterly redundant, and also happens in
             # RecursiveValidator
@@ -189,7 +190,7 @@ class RecursiveValidator(BaseItemValidator):
         except Invalid:
             e = sys.exc_info()[1]
             tree.extend(e.path)
-            raise Invalid(e.schema_item, tree, pair='value')
+            raise Invalid(e.schema_item, tree, pair='value', reason=e._reason)
         except SchemaError:
             e = sys.exc_info()[1]
             tree.extend(e.path)
