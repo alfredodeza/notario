@@ -71,3 +71,9 @@ def is_empty(value):
         return len(value) == 0
     except TypeError:
         return False
+
+
+def is_nested_tuple(value):
+    if len(value) == 2 and isinstance(value[1], tuple): # nested tuple
+        return True
+    return False
