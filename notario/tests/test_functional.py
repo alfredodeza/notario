@@ -2,6 +2,7 @@ from pytest import raises
 from notario import validate
 from notario.exceptions import Invalid, SchemaError
 from notario.validators import iterables, recursive, types, chainable, cherry_pick
+from notario.decorators import optional
 
 
 class TestValidate(object):
@@ -292,3 +293,16 @@ class TestChainableAnyIn(object):
         data = {'a': 'some string'}
         schema = ('a', chainable.AnyIn(types.string, fail))
         assert validate(data, schema) is None
+
+
+class TestOptional(object):
+
+    def test_optional_value(self):
+        data = {'optional': '', 'required': 2}
+        schema = (('optional', optional(1)), ('required', 2))
+        validate(data, schema)
+
+    def test_optional_key(self):
+        data = {'required': 2, 'zoo': 1}
+        schema = ((optional('optional'), 1), ('required', 2), ('zoo', 1))
+        validate(data, schema)

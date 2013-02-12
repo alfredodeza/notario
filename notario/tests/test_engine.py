@@ -56,6 +56,7 @@ class TestNormalizeSchema(object):
         result = engine.normalize_schema(data)
         assert result == {0: ('a', 'b'), 1: ('b', 'b'), 2: ('c', 'c')}
 
+
 class TestValidator(object):
 
     def test_validate_top_level_keys(self):
