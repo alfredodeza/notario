@@ -197,7 +197,9 @@ class TestWithRecursiveValidators(object):
         schema = ('a', recursive.AllObjects((types.string, types.integer)))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a -> b  did not pass validation against callable: integer'
+        error = exc.value.args[0]
+        assert '-> a -> b  did not pass validation against callable: integer' in error
+        assert 'not of type int' in error
 
     def test_all_objects_fail_non_callable(self):
         data = {'a': {'a': 1, 'b': 1, 'c': 1}}
@@ -240,7 +242,9 @@ class TestWithRecursiveValidators(object):
             )
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> c -> e  did not pass validation against callable: string'
+        error = exc.value.args[0]
+        assert '-> c -> e  did not pass validation against callable: string' in error
+        assert 'not of type str' in error
 
     def test_no_pollution_from_previous_traversing_all_items(self):
         data = {
