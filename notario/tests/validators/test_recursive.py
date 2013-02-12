@@ -13,7 +13,9 @@ class TestAllObjects(object):
             any_object = recursive.AllObjects(schema)
             any_object(data, [])
         msg = '-> a  did not pass validation against callable: integer'
-        assert exc.value.args[0] == msg
+        error = exc.value.args[0]
+        assert msg in error
+        assert 'not of type int' in error
 
     def test_all_objects_pass(self):
         data = {0:('a', 1), 1:('b', 2), 2:('c', 3)}
