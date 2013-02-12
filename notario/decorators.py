@@ -6,13 +6,13 @@ class instance_of(object):
     When trying to make sure the value is coming from any number of valid
     objects, you will want to use this decorator as it will make sure that
     before executing the validator it will comply being of any of the
-    valid_types.
+    ``valid_types``.
 
     For example, if the input for a given validator can be either a dictionary
     or a list, this validator could be used like::
 
         @instance_of((list, dict))
-        def ny_validator(value):
+        def my_validator(value):
             assert len(value) > 0
 
     This decorator **needs** to be called as it has a default for valid types,
@@ -20,9 +20,24 @@ class instance_of(object):
     this with the default types::
 
         @instance_of()
-        def ny_validator(value):
+        def my_validator(value):
             assert len(value) > 0
 
+    When it fails, as almost all of Notario's exceptions, it will return
+    a meaningful error, this is how passing a boolean to a validator that
+    accepts the defaults would raise said error:
+
+    .. doctest:: instance_of
+
+        >>> from notario.decorators import instance_of
+        >>> @instance_of()
+        ... def my_validator(value):
+        ...     assert len(value) == 2
+        ...
+        >>> my_validator(True)
+        Traceback (most recent call last):
+        ...
+        AssertionError: not of any valid types: ['list', 'dict', 'str']
     """
 
     def __init__(self, valid_types=None):
@@ -62,8 +77,7 @@ def optional(_object):
     This decorator has a double functionality, it can wrap validators and make
     them optional or it can wrap keys and make that entry optional.
 
-    Optional Validator:
-    -------------------
+    **Optional Validator:**
     Allows to have validators work only when there is a value that contains
     some data, otherwise it will just not pass the information to the actual
     validator and will not fail as a result.
@@ -86,8 +100,7 @@ def optional(_object):
     Of course, the schema should vary depending on your needs, it is just the
     way of constructing the validator call that should be important.
 
-    Optional Keys:
-    --------------
+    **Optional Keys:**
     Sometimes a given data structure may present optional entries. For example
     this data::
 
