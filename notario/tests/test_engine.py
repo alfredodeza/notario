@@ -202,7 +202,9 @@ class TestRecursiveValidator(object):
             validator = engine.Validator(data, schema)
             validator.validate()
 
-        assert exc.value.args[0] == '-> a -> b -> d  did not pass validation against callable: string'
+        error = exc.value.args[0]
+        assert '-> a -> b -> d  did not pass validation against callable: string' in error
+        assert 'not of type string' in error
 
 
 class TestIterableValidator(object):
