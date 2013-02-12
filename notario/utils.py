@@ -41,13 +41,9 @@ def re_sort(data):
 
     For example::
 
-        data = {16: ('1', 'b'), 3: ('1', 'a')}
-
-    Will become::
-
+        >>> data = {16: ('1', 'b'), 3: ('1', 'a')}
         >>> re_sort(data)
         >>> {0: ('1', 'a'), 1: ('1', 'b')}
-        
     """
     keys = sorted(data.keys())
     new_data = {}
