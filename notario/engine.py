@@ -9,8 +9,6 @@ class Validator(object):
     def __init__(self, data, schema):
         self.data = Data(data, schema).normalized()
         self.schema = Schema(data, schema).normalized()
-        #self.data = normalize(data)
-        #self.schema = normalize_schema(schema)
 
     def validate(self):
         self.length_equality(self.data, self.schema, 0, [])
@@ -195,39 +193,6 @@ class RecursiveValidator(BaseItemValidator):
             e = sys.exc_info()[1]
             tree.extend(e.path)
             raise SchemaError('', tree, reason=e._reason, pair='value')
-
-
-def normalize(data_structure, sort=True):
-    """
-    Receives a dictionary and returns an ordered
-    dictionary, with integers as keys for tuples.
-    """
-    if sort:
-        for k, v in data_structure.items():
-            if isinstance(v, dict):
-                data_structure[k] = normalize(v)
-        data_structure = sorted(data_structure.items())
-    return dict((number, value) for number, value in enumerate(data_structure))
-
-
-def normalize_schema(data_structure):
-    if len(data_structure) == 2 and isinstance(data_structure[1], tuple) or len(data_structure) > 2:
-        if not isinstance(data_structure[0], tuple):
-            new_struct = ndict({0: (data_structure[0], normalize_schema(data_structure[1]))})
-        else:
-            new_struct = ndict((number, value) for number, value in enumerate(data_structure))
-        for i in range(len(new_struct)):
-            value = new_struct.get(i)
-            if len(value) == 2 and isinstance(value[1], tuple): # nested tuple
-                new_struct[i] = (value[0], normalize_schema(value[1]))
-        if hasattr(data_structure, 'must_validate'):
-            new_struct.must_validate = data_structure.must_validate
-        return new_struct
-    else:
-        new_struct = ndict({0: data_structure})
-        if hasattr(data_structure, 'must_validate'):
-            new_struct.must_validate = data_structure.must_validate
-        return new_struct
 
 
 def enforce(data_item, schema_item, tree, pair):
