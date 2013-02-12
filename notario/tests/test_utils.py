@@ -58,3 +58,18 @@ class TestReSort(object):
         data = {16: ('a', 1), 4: ('b', 1), 3: ('a',1)}
         result = utils.re_sort(data)
         assert result == {0: ('a', 1), 1: ('b', 1), 2: ('a', 1)}
+
+
+class TestIsNestedTuple(object):
+
+    def test_is_nested_tuple(self):
+        value = (1, (1, 2))
+        assert utils.is_nested_tuple(value) is True
+
+    def test_is_single_tuple(self):
+        value = (1,)
+        assert utils.is_nested_tuple(value) is False
+
+    def test_second_value_is_not_typle(self):
+        value = ('a', 'b')
+        assert utils.is_nested_tuple(value) is False
