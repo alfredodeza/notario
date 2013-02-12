@@ -1,6 +1,6 @@
 import sys
-from notario.exceptions import Invalid, SchemaError, Skip
-from notario.utils import is_callable, ndict, sift
+from notario.exceptions import Invalid, SchemaError
+from notario.utils import is_callable, ndict, sift, is_empty, re_sort
 
 
 class Validator(object):
@@ -28,6 +28,8 @@ class Validator(object):
                 raise SchemaError(data, tree, reason=reason)
             data = sift(data, schema.must_validate)
 
+        schema = self.sanitize_optionals(data, schema, tree)
+
         for index in range(len(data)):
             self.length_equality(data, schema, index, tree)
             key, value = data[index]
@@ -36,20 +38,7 @@ class Validator(object):
             if isinstance(value, dict):
                 self.traverser(value, svalue, tree)
             else:
-                # In this while loop, because we may have optional validators
-                # we can't rely on the fact that we will have a 1:1 mapping of
-                # schema/data items, so if for some reason a key in the data
-                # fails validation on an key in the schema and this key is
-                # marked as ``is_optional`` it will raise a Skip exception,
-                # telling us that we need to keep moving to the next item
-                # declared in the schema
-                try_count = index
-                while True:
-                    try:
-                        self.leaf(data[index], schema[try_count], tree)
-                        break
-                    except Skip:
-                        try_count += 1
+                self.leaf(data[index], schema[index], tree)
             if tree:
                 tree.pop()
 
@@ -61,14 +50,8 @@ class Validator(object):
         """
         key, value = data
         skey, svalue = schema
-        try:
-            enforce(key, skey, tree, 'key')
-        except Invalid:
-            if hasattr(skey, 'is_optional'):
-                # then this schema is the wrong one, so let's tell our caller
-                # he needs to skip
-                raise Skip
-            raise  # otherwise re-raise
+        enforce(key, skey, tree, 'key')
+
         if hasattr(svalue, '__validator_leaf__'):
             return svalue(value, tree)
         enforce(value, svalue, tree, 'value')
@@ -85,6 +68,30 @@ class Validator(object):
             return
         if len(data) != len(schema):
             raise SchemaError(data, tree, reason='length did not match schema')
+
+    def sanitize_optionals(self, data, schema, tree):
+        data_keys = [v[0] for k, v in data.items()]
+        schema_key_map = {}
+        try:
+            for number, value in schema.items():
+                schema_key_map[number] = getattr(value[0], '_object', value[0])
+        except AttributeError:  # maybe not a dict?
+            self.length_equality(data, schema, 0, tree)
+
+        optional_keys = {}
+        for k, v in schema.items():
+            try:
+                key = getattr(v[0], '_object')
+                if key:
+                    optional_keys[k] = key
+            except AttributeError:
+                pass
+
+        for number, value in optional_keys.items():
+            if value not in data_keys:
+                del schema[number]
+        return re_sort(schema)
+
 
 
 class BaseItemValidator(object):
@@ -229,6 +236,8 @@ def enforce(data_item, schema_item, tree, pair):
     else:
         try:
             if schema_is_optional:
+                if is_empty(data_item):  # we received nothing here
+                    return
                 assert data_item == schema_item()
             else:
                 assert data_item == schema_item
