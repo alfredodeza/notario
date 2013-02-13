@@ -1,4 +1,5 @@
 from notario.exceptions import Invalid
+from notario.utils import safe_repr
 from notario.engine import RecursiveValidator
 
 
@@ -72,7 +73,6 @@ class AnyObject(BasicRecursiveValidator):
         raise Invalid(self.schema, tree, pair='value', msg=msg)
 
 
-
 class AllObjects(BasicRecursiveValidator):
     """
     For all the objects contained in a dictionary apply the schema passed in
@@ -97,8 +97,8 @@ class AllObjects(BasicRecursiveValidator):
         schema = ('foo', AllObjects(('a', 1))
         validate(data, schema)
 
-    When a single item in the array fails to pass against the validator's schema it
-    stops further iteration and it will raise an error like:
+    When a single item in the array fails to pass against the validator's
+    schema it stops further iteration and it will raise an error like:
 
 
     .. doctest:: allobjects
@@ -120,3 +120,83 @@ class AllObjects(BasicRecursiveValidator):
     def __call__(self, data, tree):
         validator = RecursiveValidator(data, self.schema, tree)
         validator.validate()
+
+
+class MultiSchema(object):
+    """
+    .. testsetup:: *
+
+        from notario import validate
+        from notario.validators.recursive import MultiSchema
+
+    This validator is useful when there is a need for validating any number of schemas
+    for a given data set.
+
+    If the requirement is, for example, to validate either ``string: string`` or ``string: int``
+    this will not be possible with any of the other validators in Notario because they all
+    assume a rule that must dominate everything. Otherwise, it is required to specify the
+    expectation.
+
+    In the case that the object to validate complies with the above requirement, this validator
+    can accept **any number** of schemas as arguments, so if one schema fails, the next one will
+    be tried until all the schemas are applied for a given item. The ``MultiSchema`` validator will
+    look like this in order to pass the incoming data:
+
+    .. doctest:: multischema
+
+        >>> data = {'main': {'foo': 'bar'}}
+        >>> schema = ('main', MultiSchema(('foo', 1), ('foo', 'bar')))
+        >>> validate(data, schema)
+
+    Because we can't be sure what the data may hold we are forced to define different rules and apply them
+    so that they can pass. If we repeat the expectation but an invalid value comes along, the validator
+    will naturally fail:
+
+    .. doctest:: mutlischema_fail
+
+        >>> data = {'main': {'foo': False}}
+        >>> schema = ('main', MultiSchema(('foo', 1), ('foo', 'bar')))
+        >>> validate(data, schema)
+        Traceback (most recent call last):
+        ...
+        Invalid: -> foo -> False did not match 'bar'
+
+    """
+
+    __validator_leaf__ = True
+
+    def __init__(self, *schemas):
+        for schema in schemas:
+            if not isinstance(schema, tuple):
+                raise TypeError("got a non schema argument: %s" % safe_repr(schema))
+        self.schemas = schemas
+
+    def __call__(self, data, tree):
+        """
+        Go through each item in data against the first schema in the arguments. If that fails
+        try each subsequent schema until it passes. Even if schemas are failing to apply to that
+        given item, consume all the available ones until at least one passes.
+
+        If nothing passes, the last error is raised.
+
+        :param data: Incoming data from the validator engine in normalized dict form.
+        :param tree: The traversing tree up to this point, always passed in.
+        :raises Invalid: If none of the schemas can validate the data.
+        """
+        index = len(data) - 1
+        validator = RecursiveValidator(data, self.schemas[0], [], index=index)
+        for item_index in range(len(data)):
+            try:
+                validator.leaf(item_index)
+            except Invalid:
+                self.itemized_validation(validator, item_index)
+
+    def itemized_validation(self, validator, item_index):
+        for schema in self.schemas:
+            try:
+                validator.schema = schema
+                validator.tree = []
+                return validator.leaf(item_index)
+            except Invalid, error:
+                error = error
+        raise error
