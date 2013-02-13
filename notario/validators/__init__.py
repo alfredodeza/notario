@@ -23,7 +23,7 @@ class cherry_pick(tuple):
             self.must_validate = tuple([key for key, value in _tuple])
         except ValueError:  # single k/v pair
             if len(_tuple) == 2:
-                self.must_validate = tuple(_tuple[0])
+                self.must_validate = (_tuple[0],)
         return super(cherry_pick, self).__init__()
 
 
@@ -40,7 +40,7 @@ class Hybrid(object):
             from notario.validators.recursive import RecursiveValidator
             validator = RecursiveValidator(value, self.schema, *args)
             validator.validate()
-            pass
         else:
-            return self.validator(value)
+            from notario.engine import enforce
+            enforce(value, self.validator, *args, pair='value')
 
