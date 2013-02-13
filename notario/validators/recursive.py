@@ -129,17 +129,18 @@ class MultiSchema(object):
         from notario import validate
         from notario.validators.recursive import MultiSchema
 
-    This validator is useful when there is a need for validating any number of schemas
-    for a given data set.
+    This validator is useful when there is a need for validating any number of
+    schemas for a given data set.
 
-    If the requirement is, for example, to validate either ``string: string`` or ``string: int``
-    this will not be possible with any of the other validators in Notario because they all
-    assume a rule that must dominate everything. Otherwise, it is required to specify the
-    expectation.
+    If the requirement is, for example, to validate either ``string: string``
+    or ``string: int`` this will not be possible with any of the other
+    validators in Notario because they all assume a rule that must dominate
+    everything. Otherwise, it is required to specify the expectation.
 
-    In the case that the object to validate complies with the above requirement, this validator
-    can accept **any number** of schemas as arguments, so if one schema fails, the next one will
-    be tried until all the schemas are applied for a given item. The ``MultiSchema`` validator will
+    In the case that the object to validate complies with the above
+    requirement, this validator can accept **any number** of schemas as
+    arguments, so if one schema fails, the next one will be tried until all the
+    schemas are applied for a given item. The ``MultiSchema`` validator will
     look like this in order to pass the incoming data:
 
     .. doctest:: multischema
@@ -148,9 +149,10 @@ class MultiSchema(object):
         >>> schema = ('main', MultiSchema(('foo', 1), ('foo', 'bar')))
         >>> validate(data, schema)
 
-    Because we can't be sure what the data may hold we are forced to define different rules and apply them
-    so that they can pass. If we repeat the expectation but an invalid value comes along, the validator
-    will naturally fail:
+    Because we can't be sure what the data may hold we are forced to define
+    different rules and apply them so that they can pass. If we repeat the
+    expectation but an invalid value comes along, the validator will naturally
+    fail:
 
     .. doctest:: mutlischema_fail
 
