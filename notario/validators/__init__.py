@@ -25,3 +25,22 @@ class cherry_pick(tuple):
             if len(_tuple) == 2:
                 self.must_validate = tuple(_tuple[0])
         return super(cherry_pick, self).__init__()
+
+
+class Hybrid(object):
+
+    __validator_leaf__ = True
+
+    def __init__(self, validator, schema):
+        self.validator = validator
+        self.schema = schema
+
+    def __call__(self, value, *args):
+        if isinstance(value, dict):
+            from notario.validators.recursive import RecursiveValidator
+            validator = RecursiveValidator(value, self.schema, *args)
+            validator.validate()
+            pass
+        else:
+            return self.validator(value)
+
