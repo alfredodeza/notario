@@ -1,6 +1,6 @@
 import sys
 from notario.exceptions import Invalid, SchemaError
-from notario.utils import is_callable, ndict, sift, is_empty, re_sort
+from notario.utils import is_callable, sift, is_empty, re_sort, is_not_empty
 from notario.normal import Data, Schema
 
 
@@ -17,7 +17,7 @@ class Validator(object):
     def traverser(self, data, schema, tree):
         """
         Traverses the dictionary, recursing onto itself if
-        it sees apropriate key/value pairs that indicate that
+        it sees appropriate key/value pairs that indicate that
         there is a need for more validation in a branch below us.
         """
         if hasattr(schema, '__validator_leaf__'):
@@ -92,6 +92,9 @@ class Validator(object):
         for number, value in optional_keys.items():
             if value not in data_keys:
                 del schema[number]
+        if not schema and is_not_empty(data):
+            msg = "unexpected extra items"
+            raise Invalid(schema, tree, reason=msg)
         return re_sort(schema)
 
 
@@ -181,6 +184,9 @@ class RecursiveValidator(BaseItemValidator):
             self.enforce(data, schema, item_index, tree)
 
     def enforce(self, data, schema, item_index, tree):
+        # yo dawg, a recursive validator within a recursive validator anyone?
+        if is_callable(schema) and hasattr(schema, '__validator_leaf__'):
+            return schema(data)
         try:
             _validate = Validator({}, self.schema)
             _validate.data = {0: data[item_index]}
@@ -202,6 +208,8 @@ def enforce(data_item, schema_item, tree, pair):
             schema_item(data_item)
         except AssertionError:
             e = sys.exc_info()[1]
+            if pair == 'value':
+                tree.append(data_item)
             raise Invalid(schema_item, tree, reason=e, pair=pair)
     else:
         try:
