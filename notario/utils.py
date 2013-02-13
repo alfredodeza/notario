@@ -73,6 +73,10 @@ def is_empty(value):
         return False
 
 
+def is_not_empty(value):
+    return not is_empty(value)
+
+
 def is_nested_tuple(value):
     if len(value) == 2 and isinstance(value[1], tuple): # nested tuple
         return True
