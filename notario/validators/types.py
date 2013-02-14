@@ -1,6 +1,7 @@
 """
 Basic type validators
 """
+from functools import wraps
 from notario._compat import basestring
 from notario.utils import is_callable
 
@@ -24,6 +25,7 @@ def string(_object):
     if is_callable(_object):
         _validator = _object
 
+        @wraps(_validator)
         def decorated(value):
             assert isinstance(value, basestring), "not of type string"
             return _validator(value)
@@ -51,6 +53,7 @@ def boolean(_object):
     if is_callable(_object):
         _validator = _object
 
+        @wraps(_validator)
         def decorated(value):
             assert isinstance(value, bool), "not of type boolean"
             return _validator(value)
@@ -78,6 +81,7 @@ def dictionary(_object):
     if is_callable(_object):
         _validator = _object
 
+        @wraps(_validator)
         def decorated(value):
             assert isinstance(value, dict), "not of type dictionary"
             return _validator(value)
@@ -105,6 +109,7 @@ def array(_object):
     if is_callable(_object):
         _validator = _object
 
+        @wraps(_validator)
         def decorated(value):
             assert isinstance(value, list), "not of type array"
             return _validator(value)
@@ -131,6 +136,7 @@ def integer(_object):
     if is_callable(_object):
         _validator = _object
 
+        @wraps(_validator)
         def decorated(value):
             assert isinstance(value, int), "not of type int"
             return _validator(value)
