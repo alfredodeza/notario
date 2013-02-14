@@ -60,7 +60,8 @@ class TestAllItems(object):
         all_items = iterables.AllItems(schema)
         with raises(Invalid) as exc:
             all_items(data, [])
-        assert exc.value.args[0] == '-> list[2] item did not match 1'
+        error = exc.value.args[0]
+        assert  '-> list[2] item did not match 1' in error
 
     def test_all_items_fail_last_item(self):
         data = [1, 1, 1, 3]
@@ -68,7 +69,9 @@ class TestAllItems(object):
         all_items = iterables.AllItems(schema)
         with raises(Invalid) as exc:
             all_items(data, [])
-        assert exc.value.args[0] == '-> list[3] item did not match 1'
+
+        error = exc.value.args[0]
+        assert  '-> list[3] item did not match 1' in error
 
     def test_all_items_fail_uses_first_invalid(self):
         data = [3, 5, 2, 3]
@@ -76,5 +79,6 @@ class TestAllItems(object):
         all_items = iterables.AllItems(schema)
         with raises(Invalid) as exc:
             all_items(data, [])
-        assert exc.value.args[0] == '-> list[0] item did not match 1'
 
+        error = exc.value.args[0]
+        assert  '-> list[0] item did not match 1' in error

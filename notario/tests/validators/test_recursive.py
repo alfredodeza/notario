@@ -13,7 +13,7 @@ class TestAllObjects(object):
         with raises(Invalid) as exc:
             any_object = recursive.AllObjects(schema)
             any_object(data, [])
-        msg = '-> a  did not pass validation against callable: integer'
+        msg = '-> a -> 1  did not pass validation against callable: integer'
         error = exc.value.args[0]
         assert msg in error
         assert 'not of type int' in error

@@ -14,7 +14,8 @@ class TestValidate(object):
         with raises(Invalid) as exc:
             validate(data, schema)
 
-        assert exc.value.args[0] == "-> a -> a  did not match 'b'"
+        error = exc.value.args[0]
+        assert  "-> a -> a  did not match 'b'" in error
 
     def test_multi_pair_non_nested_last(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
@@ -23,7 +24,8 @@ class TestValidate(object):
         with raises(Invalid) as exc:
             validate(data, schema)
 
-        assert exc.value.args[0] == "-> d -> d  did not match 'a'"
+        error = exc.value.args[0]
+        assert  "-> d -> d  did not match 'a'" in error
 
     def test_multi_pair_non_nested_first(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
@@ -32,7 +34,8 @@ class TestValidate(object):
         with raises(Invalid) as exc:
             validate(data, schema)
 
-        assert exc.value.args[0] == "-> a -> a  did not match 'b'"
+        error = exc.value.args[0]
+        assert  "-> a -> a  did not match 'b'" in error
 
     def test_multi_pair_non_nested_second(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
@@ -41,7 +44,8 @@ class TestValidate(object):
         with raises(Invalid) as exc:
             validate(data, schema)
 
-        assert exc.value.args[0] == "-> b -> b  did not match 'a'"
+        error = exc.value.args[0]
+        assert  "-> b -> b  did not match 'a'" in error
 
     def test_multi_pair_non_nested_third(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
@@ -50,7 +54,8 @@ class TestValidate(object):
         with raises(Invalid) as exc:
             validate(data, schema)
 
-        assert exc.value.args[0] == "-> c -> c  did not match 'a'"
+        error = exc.value.args[0]
+        assert  "-> c -> c  did not match 'a'" in error
 
     def test_multi_pair_non_nested_last_key(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
@@ -59,7 +64,8 @@ class TestValidate(object):
         with raises(Invalid) as exc:
             validate(data, schema)
 
-        assert exc.value.args[0] == "-> d key did not match 'a'"
+        error = exc.value.args[0]
+        assert  "-> d key did not match 'a'" in error
 
     def test_multi_pair_non_nested_first_key(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
@@ -68,7 +74,8 @@ class TestValidate(object):
         with raises(Invalid) as exc:
             validate(data, schema)
 
-        assert exc.value.args[0] == "-> a key did not match 'f'"
+        error = exc.value.args[0]
+        assert  "-> a key did not match 'f'" in error
 
     def test_multi_pair_non_nested_second_key(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
@@ -77,7 +84,8 @@ class TestValidate(object):
         with raises(Invalid) as exc:
             validate(data, schema)
 
-        assert exc.value.args[0] == "-> b key did not match 'f'"
+        error = exc.value.args[0]
+        assert  "-> b key did not match 'f'" in error
 
     def test_multi_pair_non_nested_third_key(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
@@ -86,7 +94,8 @@ class TestValidate(object):
         with raises(Invalid) as exc:
             validate(data, schema)
 
-        assert exc.value.args[0] == "-> c key did not match 'f'"
+        error = exc.value.args[0]
+        assert  "-> c key did not match 'f'" in error
 
 
 class TestCherryPick(object):
@@ -98,7 +107,8 @@ class TestCherryPick(object):
         with raises(Invalid) as exc:
             validate(data, schema)
 
-        assert exc.value.args[0] == "-> a -> b -> b  did not match 'a'"
+        error = exc.value.args[0]
+        assert  "-> a -> b -> b  did not match 'a'" in error
 
     def test_validate_custom_items(self):
         data = {'a': {'b': 'b', 'c': 'c', 'd': 'd'}}
@@ -119,7 +129,8 @@ class TestCherryPick(object):
         with raises(SchemaError) as exc:
             validate(data, schema)
 
-        assert exc.value.args[0] == "-> a  must_validate attribute must not be empty"
+        error = exc.value.args[0]
+        assert  "-> a  must_validate attribute must not be empty" in error
 
 
 class TestWithIterableValidators(object):
@@ -148,14 +159,17 @@ class TestWithIterableValidators(object):
         schema = ('a', iterables.AllItems((types.string, 2)))
         with raises(SchemaError) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a -> b  has less items in schema than in data'
+        error = exc.value.args[0]
+        assert  '-> a -> b  has less items in schema than in data' in error
 
     def test_all_items_fail_non_callable(self):
         data = {'a': [1, 2, '3', 4, 5]}
         schema = ('a', iterables.AllItems('foo'))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == "-> a -> list[0] item did not match 'foo'"
+
+        error = exc.value.args[0]
+        assert  "-> a -> list[0] item did not match 'foo'" in error
 
 
     def test_any_items_fail(self):
@@ -163,21 +177,27 @@ class TestWithIterableValidators(object):
         schema = ('a', iterables.AnyItem(types.string))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a -> list[]  did not contain any valid items against callable: string'
+
+        error = exc.value.args[0]
+        assert  '-> a -> list[]  did not contain any valid items against callable: string' in error
 
     def test_any_items_fail_non_callable(self):
         data = {'a': [1, 2, 3, 4, 5]}
         schema = ('a', iterables.AnyItem('foo'))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == "-> a -> list[]  did not contain any valid items matching 'foo'"
+
+        error = exc.value.args[0]
+        assert  "-> a -> list[]  did not contain any valid items matching 'foo'" in error
 
     def test_any_item_with_dictionaries(self):
         data = {'a': [{'a': 1}, {'b': 2}]}
         schema = ('a', iterables.AnyItem(('c', 4)))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == "-> a -> list[]  did not contain any valid items matching ('c', 4)"
+
+        error = exc.value.args[0]
+        assert  "-> a -> list[]  did not contain any valid items matching ('c', 4)" in error
 
 
 class TestWithRecursiveValidators(object):
@@ -198,7 +218,7 @@ class TestWithRecursiveValidators(object):
         with raises(Invalid) as exc:
             validate(data, schema)
         error = exc.value.args[0]
-        assert '-> a -> b  did not pass validation against callable: integer' in error
+        assert '-> a -> b -> a string  did not pass validation against callable: integer' in error
         assert 'not of type int' in error
 
     def test_all_objects_fail_non_callable(self):
@@ -206,28 +226,35 @@ class TestWithRecursiveValidators(object):
         schema = ('a', recursive.AllObjects((types.string, 2)))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a -> a -> 1  did not match 2'
+        error = exc.value.args[0]
+        assert  '-> a -> a -> 1  did not match 2' in error
 
     def test_all_objects_fail_length(self):
         data = {'a': {'a': 2, 'b': {'a': 'b'}}}
         schema = ('a', recursive.AllObjects((types.string, 2)))
         with raises(SchemaError) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a -> b  has less items in schema than in data'
+
+        error = exc.value.args[0]
+        assert  '-> a -> b  has less items in schema than in data' in error
 
     def test_any_object_fail(self):
         data = {'a': {'a': 1, 'b': 4, 'c': 3}}
         schema = ('a', recursive.AnyObject((types.string, types.string)))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a  did not contain any valid objects against callable: AnyObject'
+
+        error = exc.value.args[0]
+        assert  '-> a  did not contain any valid objects against callable: AnyObject' in error
 
     def test_any_objects_fail_non_callable(self):
         data = {'a': {'a': 1, 'b': 4, 'c': 3}}
         schema = ('a', recursive.AnyObject(('a', 'a')))
         with raises(Invalid) as exc:
             validate(data, schema)
-        assert exc.value.args[0] == '-> a  did not contain any valid objects against callable: AnyObject'
+
+        error = exc.value.args[0]
+        assert  '-> a  did not contain any valid objects against callable: AnyObject' in error
 
     def test_no_pollution_from_previous_traversing_all_objects(self):
         data = {
@@ -243,7 +270,7 @@ class TestWithRecursiveValidators(object):
         with raises(Invalid) as exc:
             validate(data, schema)
         error = exc.value.args[0]
-        assert '-> c -> e  did not pass validation against callable: string' in error
+        assert '-> c -> e -> 1  did not pass validation against callable: string' in error
         assert 'not of type str' in error
 
     def test_no_pollution_from_previous_traversing_all_items(self):
@@ -278,7 +305,7 @@ class TestChainableAllIn(object):
         with raises(Invalid) as exc:
             validate(data, schema)
         error = exc.value.args[0]
-        assert '-> a  did not pass validation against callable: AllIn -> boolean' in error
+        assert '-> a -> some string  did not pass validation against callable: AllIn -> boolean' in error
 
 
 class TestChainableAnyIn(object):
@@ -290,7 +317,7 @@ class TestChainableAnyIn(object):
         with raises(Invalid) as exc:
             validate(data, schema)
         error = exc.value.args[0]
-        assert '-> a  did not pass validation against callable: AnyIn' in error
+        assert '-> a -> some string  did not pass validation against callable: AnyIn' in error
 
     def test_one_item_passes(self):
         def fail(value): raise AssertionError
