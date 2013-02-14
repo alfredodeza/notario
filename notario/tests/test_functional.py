@@ -1,7 +1,8 @@
 from pytest import raises
 from notario import validate
 from notario.exceptions import Invalid, SchemaError
-from notario.validators import iterables, recursive, types, chainable, cherry_pick
+from notario.validators import (iterables, recursive, types,
+                                chainable, cherry_pick, Hybrid)
 from notario.decorators import optional
 
 
@@ -16,6 +17,16 @@ class TestValidate(object):
 
         error = exc.value.args[0]
         assert  "-> a -> a  did not match 'b'" in error
+
+    def test_key_is_empty_string(self):
+        data = {'a': ''}
+        schema = (('a', 'b'))
+
+        with raises(Invalid) as exc:
+            validate(data, schema)
+
+        error = exc.value.args[0]
+        assert  "-> a -> ''  did not match 'b'" in error
 
     def test_multi_pair_non_nested_last(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
@@ -207,6 +218,14 @@ class TestWithRecursiveValidators(object):
         schema = ('a', recursive.AllObjects((types.string, types.integer)))
         assert validate(data, schema) is None
 
+    def test_all_objects_pass_with_hybrid(self):
+        data = {'a': {'a': 1, 'b': 2, 'c': 3}}
+        dawg = Hybrid(lambda x: True, (types.string, types.integer))
+        yo_dawg = recursive.AllObjects(dawg)
+        schema = ('a', yo_dawg)
+        assert validate(data, schema) is None
+
+
     def test_any_objects_pass(self):
         data = {'a': {'a': 1, 'b':'a string', 'c': 3}}
         schema = ('a', recursive.AnyObject((types.string, types.string)))
@@ -258,15 +277,15 @@ class TestWithRecursiveValidators(object):
 
     def test_no_pollution_from_previous_traversing_all_objects(self):
         data = {
-                'a' : { 'a': 1, 'b': 2 },
-                'b' : { 'c' :1, 'd': 2 },
-                'c' : { 'e': 1, 'f': 2 }
-            }
+            'a' : { 'a': 1, 'b': 2 },
+            'b' : { 'c' :1, 'd': 2 },
+            'c' : { 'e': 1, 'f': 2 }
+        }
         schema = (
-                ('a', (('a', 1), ('b', 2))),
-                ('b', (('c', 1), ('d', 2))),
-                ('c', recursive.AllObjects((types.string, types.string)))
-            )
+            ('a', (('a', 1), ('b', 2))),
+            ('b', (('c', 1), ('d', 2))),
+            ('c', recursive.AllObjects((types.string, types.string)))
+        )
         with raises(Invalid) as exc:
             validate(data, schema)
         error = exc.value.args[0]
@@ -275,15 +294,15 @@ class TestWithRecursiveValidators(object):
 
     def test_no_pollution_from_previous_traversing_all_items(self):
         data = {
-                'a' : { 'a': 1, 'b': 2 },
-                'b' : { 'c' :1, 'd': 2 },
-                'c' : ['e', 1, 'f', 2 ]
-            }
+            'a' : { 'a': 1, 'b': 2 },
+            'b' : { 'c' :1, 'd': 2 },
+            'c' : ['e', 1, 'f', 2 ]
+        }
         schema = (
-                ('a', (('a', 1), ('b', 2))),
-                ('b', (('c', 1), ('d', 2))),
-                ('c', iterables.AllItems(types.string))
-            )
+            ('a', (('a', 1), ('b', 2))),
+            ('b', (('c', 1), ('d', 2))),
+            ('c', iterables.AllItems(types.string))
+        )
         with raises(Invalid) as exc:
             validate(data, schema)
         error = exc.value.args[0]
