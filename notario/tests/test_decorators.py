@@ -48,6 +48,12 @@ class TestInstanceOf(object):
 
 class TestNotEmpty(object):
 
+    def test_not_of_any_valid_types(self):
+        with raises(AssertionError) as exc:
+            decorators.not_empty(False)
+        errors = exc.value.args[0]
+        assert 'not of any valid types' in errors
+
     def test_not_empty_dict(self):
         @decorators.not_empty
         def validator(value):
