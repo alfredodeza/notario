@@ -40,8 +40,8 @@ class AnyObject(BasicRecursiveValidator):
         schema = ('foo', AnyObject(('a', 1))
         validate(data, schema)
 
-    When a single item in the array fails to pass against the validator's schema it
-    stops further iteration and it will raise an error like:
+    When a single item in the array fails to pass against the validator's
+    schema it stops further iteration and it will raise an error like:
 
 
     .. doctest:: anyobject
@@ -175,13 +175,15 @@ class MultiSchema(object):
 
     def __call__(self, data, tree):
         """
-        Go through each item in data against the first schema in the arguments. If that fails
-        try each subsequent schema until it passes. Even if schemas are failing to apply to that
-        given item, consume all the available ones until at least one passes.
+        Go through each item in data against the first schema in the arguments.
+        If that fails try each subsequent schema until it passes. Even if
+        schemas are failing to apply to that given item, consume all the
+        available ones until at least one passes.
 
         If nothing passes, the last error is raised.
 
-        :param data: Incoming data from the validator engine in normalized dict form.
+        :param data: Incoming data from the validator engine in normalized dict
+        form.
         :param tree: The traversing tree up to this point, always passed in.
         :raises Invalid: If none of the schemas can validate the data.
         """
