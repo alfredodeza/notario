@@ -60,7 +60,12 @@ class Validator(object):
     def length_equality(self, data, schema, index, tree):
         try:
             data = data[index]
-            schema = schema[index]
+            try:
+                schema = schema[index]
+            except KeyError:
+                if not hasattr(schema, 'must_validate'):
+                    reason = 'has unexpected item in data: %s' % repr(data)
+                    raise Invalid(None, tree, msg=reason, reason=reason, pair='value')
         except (KeyError, TypeError):
             if not hasattr(schema, 'must_validate'):
                 reason = "has less items in schema than in data"
