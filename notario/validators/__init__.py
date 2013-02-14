@@ -41,6 +41,9 @@ class Hybrid(object):
             validator = RecursiveValidator(value, self.schema, *args)
             validator.validate()
         else:
+            try:
+                tree = args[0]
+            except IndexError:
+                tree = []
             from notario.engine import enforce
-            enforce(value, self.validator, *args, pair='value')
-
+            enforce(value, self.validator, tree, pair='value')
