@@ -1,6 +1,7 @@
 from pytest import raises
 from notario.validators import Hybrid
 from notario.exceptions import Invalid
+from notario.decorators import optional
 from notario import validate
 
 
@@ -60,3 +61,13 @@ class TestFunctional(object):
         error = exc.value.args[0]
         assert '1 -> 2  did not match 1' in error
         assert error.startswith('-> a -> 1')
+
+    def test_extra_unexpected_items(self):
+        optional_schema = (optional(1), 1)
+        schema = ('a', Hybrid(validator, optional_schema))
+        data = {'a': {'foo': 'bar'}}
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        error = exc.value.args[0]
+        assert '-> a  did not match {}' in error
+        assert exc.value.reason == 'unexpected extra items'
