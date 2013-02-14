@@ -28,6 +28,39 @@ class cherry_pick(tuple):
 
 
 class Hybrid(object):
+    """
+    Validators in Notario are usually meant to validate very specific, granular
+    *values* or *items*, but there is no easy way of trying to validate
+    a single value or to enforce a schema if for some reason the validator
+    doesn't know if it will get a single value or an object.
+
+    For example, if the constraint was something like: "value can be either an
+    integer or an array with integers", it would not be possible to juggle that
+    with other validators.
+
+    The Hybrid validator helps with that as it is able to accept both
+    a validator and a schema. If it receives something that looks like a single
+    value (like a boolean, integer or string) it will use the validator,
+    otherwise, it will trigger Notario's engine along with the schema provided
+    at initialization.
+
+    This is how the previous scenario would be represented::
+
+    .. doctest:: Hybrid
+
+        >>> from notario.validators import Hybrid
+        >>> from notario import validate
+        >>> def validator(value):
+            ... assert isinstance(value, bool)
+            ...
+        >>> schema = ('a', Hybrid(validator, ('a', 1)))
+        >>> data = {'a', False}
+        >>> validate(data, schema)
+        >>> # if data changes, the validator accomodates for it
+        >>> data = {'a': {'a': 1}}
+        >>> vaidate(data, schema)
+
+    """
 
     __validator_leaf__ = True
 
