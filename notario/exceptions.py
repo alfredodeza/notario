@@ -17,21 +17,29 @@ class NotarioException(Exception):
     def _format_path(self, use_pair=True):
         message = ""
         for key in self.path:
+            if isinstance(key, basestring):
+                if key == '':
+                    key = "'%s'" % key
             accessed_key = '-> %s ' % key
             message += accessed_key
         if use_pair and self._pair != 'value':
             return message + self._pair
         return message or "-> top level"
 
+    def _formatted_reason(self):
+        if self.reason:
+            return " (%s)" % self.reason
+        return ''
+
     def _format_message(self):
-        reason = " (%s)" % self.reason if self.reason else ''
+        reason = self._formatted_reason()
         if self._msg:
             return self._msg
         if is_callable(self.schema_item):
             msg = "did not pass validation against callable: %s"\
                   "%s" % (self.schema_item.__name__, reason)
         else:
-            msg = "did not match %s" % (repr(self.schema_item))
+            msg = "did not match %s%s" % (repr(self.schema_item), reason)
         return msg
 
     @property
@@ -41,7 +49,7 @@ class NotarioException(Exception):
         except IndexError:
             return self._reason
         except AttributeError:
-            return ''
+            return self._reason or ''
 
 
 class Invalid(NotarioException):
