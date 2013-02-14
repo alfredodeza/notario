@@ -61,12 +61,12 @@ class TestValidator(object):
     def test_validate_length_equality_less_items(self):
         data = {'a': 1, 'b': 2, 'c':'c'}
         schema = (('a', 1), ('b', 2))
-        with raises(SchemaError) as exc:
+        with raises(Invalid) as exc:
             validator = engine.Validator(data, schema)
             validator.validate()
 
         error = exc.value.args[0]
-        assert  '-> top level has less items in schema than in data' in error
+        assert "top level has unexpected item in data: ('c', 'c')" in error
 
     def test_validate_length_equality_returns(self):
         data = {0:('a', 1)}
