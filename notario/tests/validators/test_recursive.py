@@ -64,6 +64,10 @@ class TestMultiSchema(object):
         multi = recursive.MultiSchema(*schemas)
         assert multi(data, []) is None
 
+    def test_fail_on_non_callable(self):
+        with raises(TypeError):
+            recursive.MultiSchema(False)
+
     def test_pass_two_data_items(self):
         data = Data({'a': 2, 'b': 1}, {}).normalized()
         schemas = (('a', 2), ('b', 1))
