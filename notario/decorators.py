@@ -1,3 +1,4 @@
+from functools import wraps
 from notario.utils import is_callable, safe_repr
 
 
@@ -67,6 +68,7 @@ def not_empty(_object):
     if is_callable(_object):
         _validator = _object
 
+        @wraps(_validator)
         @instance_of()
         def decorated(value):
             assert value, "%s is empty" % safe_repr(value)
@@ -127,6 +129,7 @@ def optional(_object):
     if is_callable(_object):
         validator = _object
 
+        @wraps(validator)
         def decorated(value):
             if value:
                 return validator(value)
