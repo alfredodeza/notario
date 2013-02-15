@@ -137,8 +137,8 @@ def optional(_object):
 
         return decorated
     else:
-        def wrapped(*args):
+        def optional(*args):
             return _object
-        wrapped.is_optional = True
-        wrapped._object = _object
-        return wrapped
+        optional.is_optional = True
+        optional._object = _object
+        return optional
