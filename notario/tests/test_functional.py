@@ -108,6 +108,16 @@ class TestValidate(object):
         error = exc.value.args[0]
         assert  "-> c key did not match 'f'" in error
 
+    def test_key_fails_before_value(self):
+        data = {'a': {'a': {'b': 'b'}}}
+        schema = ('a', ('b', ('b', 'b')))
+
+        with raises(Invalid) as exc:
+            validate(data, schema)
+
+        error = exc.value.args[0]
+        assert  "-> a -> a key did not match 'b'" in error
+
 
 class TestCherryPick(object):
 
