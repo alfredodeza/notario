@@ -85,3 +85,24 @@ class TestIsNestedTuple(object):
     def test_second_value_is_not_typle(self):
         value = ('a', 'b')
         assert utils.is_nested_tuple(value) is False
+
+
+class TestDataItem(object):
+
+    def setup(self):
+        self.ndict = utils.ndict()
+
+    def test_return_key_from_ndict(self):
+        self.ndict[0] = ('a', 'b')
+        assert utils.data_item(self.ndict) == "'a'"
+
+    def test_return_key_from_non_ndict(self):
+        data = {'b': 'b'}
+        assert utils.data_item(data) == "'b'"
+
+    def test_return_first_item_in_list(self):
+        data = ['a', 'b', 'c']
+        assert utils.data_item(data) == "'a'"
+
+    def test_fallback_to_repr_of_obj(self):
+        assert utils.data_item(self.ndict) == "{}"
