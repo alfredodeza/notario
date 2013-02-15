@@ -81,3 +81,25 @@ def is_nested_tuple(value):
     if len(value) == 2 and isinstance(value[1], tuple): # nested tuple
         return True
     return False
+
+
+def data_item(data):
+    """
+    When trying to return a meaningful error about an unexpected data item
+    we cannot just `repr(data)` as that could show a gigantic data struture.
+
+    This utility should try to get the key of the first item or the single item
+    in the data structure.
+    """
+    if isinstance(data, ndict):
+        # OK, we have something that looks like {0: ('a', 'b')}
+        # or something that is a regular dictionary
+        # so try to return 'a' regardless of the length
+        for item in data:
+            return repr(data[item][0])
+    elif isinstance(data, dict):
+        for item in data:
+            return repr(data[item])
+    elif isinstance(data, list):
+        return repr(data[0])
+    return repr(data)
