@@ -207,7 +207,7 @@ class RecursiveValidator(BaseItemValidator):
     def enforce(self, data, schema, item_index, tree):
         # yo dawg, a recursive validator within a recursive validator anyone?
         if is_callable(schema) and hasattr(schema, '__validator_leaf__'):
-            return schema(data)
+            return schema(data, tree)
         try:
             _validate = Validator({}, self.schema)
             _validate.data = {0: data[item_index]}
