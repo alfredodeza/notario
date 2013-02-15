@@ -69,7 +69,7 @@ class Hybrid(object):
         self.schema = schema
 
     def __call__(self, value, *args):
-        if isinstance(value, dict):
+        if isinstance(value, (dict, list)):
             from notario.validators.recursive import RecursiveValidator
             validator = RecursiveValidator(value, self.schema, *args)
             validator.validate()
