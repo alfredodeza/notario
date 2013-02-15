@@ -1,6 +1,7 @@
 import sys
 from notario.exceptions import Invalid, SchemaError
-from notario.utils import is_callable, sift, is_empty, re_sort, is_not_empty
+from notario.utils import (is_callable, sift, is_empty, re_sort, is_not_empty,
+                           data_item)
 from notario.normal import Data, Schema
 
 
@@ -36,26 +37,41 @@ class Validator(object):
             key, value = data[index]
             skey, svalue = schema[index]
             tree.append(key)
-            if isinstance(value, dict):
+
+            # Validate the key before anything, to prevent recursing
+            self.key_leaf(data[index], schema[index], tree)
+
+            # If a dict is a value we need to recurse.
+            # XXX Should we check isinstance(value, ndict) ?
+            if isinstance(value, dict) and len(value):
                 self.traverser(value, svalue, tree)
             else:
-                self.leaf(data[index], schema[index], tree)
+                self.value_leaf(data[index], schema[index], tree)
             if tree:
                 tree.pop()
 
-    def leaf(self, data, schema, tree):
+    def key_leaf(self, data, schema, tree):
         """
-        The deepest validation we can make in any given circumstance. Does not
-        recurse, it will just receive both values and the tree, passing them on
-        to the :fun:`enforce` function.
+        The deepest validation we can make in any given circumstance for a key.
+        Does not recurse, it will just receive both values and the tree,
+        passing them on to the :fun:`enforce` function.
         """
         key, value = data
-        skey, svalue = schema
-        enforce(key, skey, tree, 'key')
+        schema_key, schema_value = schema
+        enforce(key, schema_key, tree, 'key')
 
-        if hasattr(svalue, '__validator_leaf__'):
-            return svalue(value, tree)
-        enforce(value, svalue, tree, 'value')
+    def value_leaf(self, data, schema, tree):
+        """
+        The deepest validation we can make in any given circumstance for
+        a value. Does not recurse, it will just receive both values and the
+        tree, passing them on to the :fun:`enforce` function.
+        """
+        key, value = data
+        schema_key, schema_value = schema
+
+        if hasattr(schema_value, '__validator_leaf__'):
+            return schema_value(value, tree)
+        enforce(value, schema_value, tree, 'value')
 
     def length_equality(self, data, schema, index, tree):
         try:
@@ -64,7 +80,7 @@ class Validator(object):
                 schema = schema[index]
             except KeyError:
                 if not hasattr(schema, 'must_validate'):
-                    reason = 'has unexpected item in data: %s' % repr(data)
+                    reason = 'has unexpected item in data: %s' % data_item(data)
                     raise Invalid(None, tree, msg=reason, reason=reason, pair='value')
         except (KeyError, TypeError):
             if not hasattr(schema, 'must_validate'):
