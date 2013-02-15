@@ -154,6 +154,26 @@ class TestCherryPick(object):
         assert  "-> a  must_validate attribute must not be empty" in error
 
 
+class TestHybrid(object):
+
+    def test_hybrid_delegates_when_dict_or_list(self):
+        # send off to Recursive when isinstance(value, (dict, list))
+        data = {'a':  ['a']}
+        hybrid = Hybrid(types.string, iterables.AllItems('b'))
+        schema = ('a', hybrid)
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        error = exc.value.args[0]
+        assert "list[0] item did not match 'b'" in error
+
+    def test_hybrid_delegates_when_dict_or_empty_list(self):
+        # send off to Recursive when isinstance(value, (dict, list))
+        data = {'a':  []}
+        hybrid = Hybrid(types.string, iterables.AllItems('b'))
+        schema = ('a', hybrid)
+        assert validate(data, schema) is None
+
+
 class TestWithIterableValidators(object):
 
     def test_all_items_pass(self):
