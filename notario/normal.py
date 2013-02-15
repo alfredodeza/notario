@@ -25,7 +25,7 @@ class Data(BaseNormalize):
                 if isinstance(v, dict):
                     data_structure[k] = self._normalize(v)
             data_structure = sorted(data_structure.items())
-        return self.ordered_dict(data_structure)
+        return self.ordered_dict(data_structure, use_n_dict=True)
 
     def normalized(self):
         """
