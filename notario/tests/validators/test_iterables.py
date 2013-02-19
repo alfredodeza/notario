@@ -54,6 +54,15 @@ class TestAllItems(object):
         all_items = iterables.AllItems(schema)
         assert all_items(data, []) is None
 
+    def test_all_items_fail_on_non_lists(self):
+        data = 4
+        schema = 1
+        all_items = iterables.AllItems(schema)
+        with raises(SchemaError) as exc:
+            all_items(data, [])
+        error = exc.value.args[0]
+        assert  'top level AllItems needs a list to validate' in error
+
     def test_all_items_fail(self):
         data = [1, 1, 3, 1]
         schema = 1

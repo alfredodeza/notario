@@ -2,7 +2,7 @@
 Iterable validators for array objects only. They provide a way of
 applying a schema to any given items in an array.
 """
-from notario.exceptions import Invalid
+from notario.exceptions import Invalid, SchemaError
 from notario.engine import IterableValidator
 from notario.utils import is_callable
 
@@ -84,7 +84,8 @@ class AllItems(BasicIterableValidator):
     For all the items in an array apply the schema passed in to the validator.
     If a single item fails, it raises ``Invalid``.
 
-    .. note:: It only works on arrays, otherwise it will raise a ``SchemaError``
+    .. note::
+        It only works on arrays, otherwise it will raise a ``SchemaError``
 
     .. testsetup:: allitems
 
@@ -103,8 +104,8 @@ class AllItems(BasicIterableValidator):
         schema = ('foo', AllItems(('a', 1))
         validate(data, schema)
 
-    When a single item in the array fails to pass against the validator's schema it
-    stops further iteration and it will raise an error like:
+    When a single item in the array fails to pass against the validator's
+    schema it stops further iteration and it will raise an error like:
 
 
     .. doctest:: allitems
@@ -116,12 +117,15 @@ class AllItems(BasicIterableValidator):
         ...
         Invalid: -> foo -> list[1] -> a -> 2  did not match 1
 
-    In this particular validator, it remembers on what index of the array the failure
-    was created and it goes even further giving the key and value of the object it
-    went against.
+    In this particular validator, it remembers on what index of the array the
+    failure was created and it goes even further giving the key and value of
+    the object it went against.
 
     """
 
     def __call__(self, data, tree):
+        if not isinstance(data, list):
+            reason = 'AllItems needs a list to validate'
+            raise SchemaError('', tree, reason=reason, pair='value')
         validator = IterableValidator(data, self.schema, tree, name='AllItems')
         validator.validate()
