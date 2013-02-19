@@ -21,7 +21,7 @@ class Linker(list):
         self._sanity(regexes)
         self.prepend_negation = prepend_negation
         self.regexes = regexes
-        self.build()
+        self._build()
 
     def _sanity(self, items):
         try:
@@ -30,7 +30,7 @@ class Linker(list):
         except ValueError:
             raise TypeError('arguments must be key value pairs')
 
-    def build(self):
+    def _build(self):
         self.append(re.compile(self.regexes[0][0]))
         for number in range(1, len(self.regexes)):
             new_regex = self._get_regex(number)
@@ -42,7 +42,7 @@ class Linker(list):
             items.append(item)
         return ''.join(items)
 
-    def get_reason(self, item_number):
+    def _get_reason(self, item_number):
         reason = self.regexes[item_number][1]
         if self.prepend_negation:
             return "does not %s" % self.regexes[item_number][1]
@@ -51,7 +51,7 @@ class Linker(list):
     def __call__(self, value):
         for count, regex in enumerate(self):
             if not regex.match(value):
-                raise AssertionError(self.get_reason(count))
+                raise AssertionError(self._get_reason(count))
 
 
 def chain(*regexes, **kwargs):
