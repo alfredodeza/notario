@@ -60,6 +60,11 @@ class Hybrid(object):
         >>> data = {'a': {'a': 1}}
         >>> vaidate(data, schema)
 
+    .. warning::
+        Only if the argument passed in to this validator is of type ``list`` or
+        ``dict`` will the schema be enforced, otherwise it will fall back to
+        using the validator.
+
     """
 
     __validator_leaf__ = True
