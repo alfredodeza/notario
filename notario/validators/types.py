@@ -3,7 +3,7 @@ Basic type validators
 """
 from functools import wraps
 from notario._compat import basestring
-from notario.utils import is_callable
+from notario.utils import is_callable, forced_leaf_validator
 
 
 def string(_object):
@@ -61,7 +61,8 @@ def boolean(_object):
     assert isinstance(_object, bool), "not of type boolean"
 
 
-def dictionary(_object):
+@forced_leaf_validator
+def dictionary(_object, *args):
     """
     Validates a given input is of type dictionary.
 
