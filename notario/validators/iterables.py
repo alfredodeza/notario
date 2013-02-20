@@ -2,9 +2,9 @@
 Iterable validators for array objects only. They provide a way of
 applying a schema to any given items in an array.
 """
-from notario.exceptions import NestedInvalid, Invalid
+from notario.exceptions import Invalid
 from notario.engine import IterableValidator
-from notario.utils import is_callable, safe_repr
+from notario.utils import is_callable, safe_repr, expand_schema
 
 
 class BasicIterableValidator(object):
@@ -29,7 +29,7 @@ class BasicIterableValidator(object):
             name = self.__class__.__name__
             msg = "did not pass validation against callable: %s" % name
             reason = 'expected a list but got %s' % safe_repr(data)
-            raise NestedInvalid(self.schema, tree, reason=reason, pair='value', msg=msg)
+            raise Invalid(self.schema, tree, reason=reason, pair='value', msg=msg)
 
 
 class AnyItem(BasicIterableValidator):
@@ -75,9 +75,10 @@ class AnyItem(BasicIterableValidator):
     """
 
     def __call__(self, data, tree):
+        schema = expand_schema(self.schema)
         self.safe_type(data, tree)
         index = len(data) - 1
-        validator = IterableValidator(data, self.schema, [], index=index, name='AnyItem')
+        validator = IterableValidator(data, schema, [], index=index, name='AnyItem')
         for item_index in range(len(data)):
             try:
                 return validator.leaf(item_index)
@@ -85,11 +86,11 @@ class AnyItem(BasicIterableValidator):
                 pass
 
         tree.append('list[]')
-        if is_callable(self.schema):
-            msg = "did not contain any valid items against callable: %s" % self.schema.__name__
+        if is_callable(schema):
+            msg = "did not contain any valid items against callable: %s" % schema.__name__
         else:
-            msg = "did not contain any valid items matching %s" % repr(self.schema)
-        raise Invalid(self.schema, tree, pair='value', msg=msg)
+            msg = "did not contain any valid items matching %s" % repr(schema)
+        raise Invalid(schema, tree, pair='value', msg=msg)
 
 
 class AllItems(BasicIterableValidator):
@@ -137,6 +138,7 @@ class AllItems(BasicIterableValidator):
     """
 
     def __call__(self, data, tree):
+        schema = expand_schema(self.schema)
         self.safe_type(data, tree)
-        validator = IterableValidator(data, self.schema, tree, name='AllItems')
+        validator = IterableValidator(data, schema, tree, name='AllItems')
         validator.validate()
