@@ -116,3 +116,19 @@ def forced_leaf_validator(func):
     """
     func.__validator_leaf__ = True
     return func
+
+
+def expand_schema(schema):
+    if hasattr(schema, '__delayed__'):
+        return schema()
+    return schema
+
+
+def is_schema(_object):
+    """
+    A helper to determine if we are indeed dealing with what it seems to be
+    a schema.
+    """
+    if hasattr(_object, '__delayed__') or isinstance(_object, tuple):
+        return True
+    return False
