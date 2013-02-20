@@ -14,6 +14,8 @@ def safe_repr(obj):
     to user a ``repr()`` call.
     """
     name = getattr(obj, '__name__', getattr(obj.__class__, '__name__'))
+    if name == 'ndict':
+        name = 'dict'
     return name or repr(obj)
 
 
