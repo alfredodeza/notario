@@ -239,14 +239,14 @@ class TestIterableValidator(object):
         error = exc.value.args[0]
         assert "iterable contains single items, schema does not" in error
 
-    def test_schema_error_on_non_list(self):
+    def test_invalid_on_non_list(self):
         data = {'foo': [{'a':'b'}, {'b': 'c'}]}
         schema = (types.string, 'b') # note how this is not normalized
         iter_validator = engine.IterableValidator(data, schema, index=0)
-        with raises(SchemaError) as exc:
+        with raises(Invalid) as exc:
             iter_validator.validate()
         error = exc.value.args[0]
-        assert "top level IterableValidator needs a list to validate" in error
+        assert "top level did not pass validation against callable: IterableValidator" in error
 
 
 class TestOptionalKeys(object):
