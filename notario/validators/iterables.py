@@ -4,7 +4,7 @@ applying a schema to any given items in an array.
 """
 from notario.exceptions import Invalid, SchemaError
 from notario.engine import IterableValidator
-from notario.utils import is_callable
+from notario.utils import is_callable, safe_repr
 
 
 class BasicIterableValidator(object):
@@ -18,6 +18,16 @@ class BasicIterableValidator(object):
 
     def __init__(self, schema):
         self.schema = schema
+
+    def safe_type(self, data, tree):
+        """
+        Make sure that the incoming data complies with the class type we
+        are expecting it to be. In this case, classes that inherit from this
+        base class expect data to be of type ``list``.
+        """
+        if not isinstance(data, list):
+            reason = 'expected a list but got %s' % safe_repr(data)
+            raise Invalid(self.schema, tree, reason=reason, pair='value')
 
 
 class AnyItem(BasicIterableValidator):
@@ -63,6 +73,7 @@ class AnyItem(BasicIterableValidator):
     """
 
     def __call__(self, data, tree):
+        self.safe_type(data, tree)
         index = len(data) - 1
         validator = IterableValidator(data, self.schema, [], index=index, name='AnyItem')
         for item_index in range(len(data)):
@@ -124,8 +135,6 @@ class AllItems(BasicIterableValidator):
     """
 
     def __call__(self, data, tree):
-        if not isinstance(data, list):
-            reason = 'AllItems needs a list to validate'
-            raise SchemaError('', tree, reason=reason, pair='value')
+        self.safe_type(data, tree)
         validator = IterableValidator(data, self.schema, tree, name='AllItems')
         validator.validate()
