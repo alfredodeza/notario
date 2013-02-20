@@ -1,7 +1,7 @@
 import sys
-from notario.exceptions import Invalid, SchemaError
+from notario.exceptions import Invalid, SchemaError, NestedInvalid
 from notario.utils import (is_callable, sift, is_empty, re_sort, is_not_empty,
-                           data_item)
+                           data_item, safe_repr)
 from notario.normal import Data, Schema
 
 
@@ -147,8 +147,9 @@ class IterableValidator(BaseItemValidator):
     def data_sanity(self, data, tree=None):
         if not isinstance(data, list):
             name = self.name or 'IterableValidator'
-            reason = '%s needs a list to validate' % name
-            raise SchemaError('', tree or [], reason=reason, pair='value')
+            reason = 'expected a list but got %s' % safe_repr(data)
+            msg = 'did not pass validation against callable: %s' % name
+            raise Invalid('', tree or [], msg=msg, reason=reason, pair='value')
 
     def leaf(self, index):
         self.data_sanity(self.data, tree=self.tree)
@@ -176,6 +177,13 @@ class IterableValidator(BaseItemValidator):
                 e = sys.exc_info()[1]
                 tree.extend(e.path)
                 raise SchemaError('', tree, reason=e._reason, pair='value')
+
+            except NestedInvalid:
+                e = sys.exc_info()[1]
+                tree.append('list[%s]' % item_index)
+                tree.extend(e.path)
+                raise Invalid(e.schema_item, tree, msg=e._msg, reason=e._reason, pair='value')
+
 
         elif isinstance(schema, tuple) and not isinstance(data[item_index], (tuple, dict)):
             raise SchemaError(data, tree, reason='iterable contains single items, schema does not')
@@ -215,7 +223,7 @@ class RecursiveValidator(BaseItemValidator):
         except Invalid:
             e = sys.exc_info()[1]
             tree.extend(e.path)
-            raise Invalid(e.schema_item, tree, pair='value', reason=e._reason)
+            raise Invalid(e.schema_item, tree, pair='value', msg=e._msg, reason=e._reason)
         except SchemaError:
             e = sys.exc_info()[1]
             tree.extend(e.path)
