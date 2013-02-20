@@ -142,3 +142,29 @@ def optional(_object):
         optional.is_optional = True
         optional._object = _object
         return optional
+
+
+def delay(func):
+    """
+    When schemas are referencing to each other, this decorator will help by
+    marking a schema as ``delayed`` to avoid the need for calling a schema to
+    generate itself until it is actually needed.
+
+    For example, if a schema function references to itself in this manner::
+
+        def my_schema():
+            return (
+                ('a', 'foo'),
+                ('b', my_schema()),
+            )
+
+    Because ``my_schema`` is being called within itself, it will get into
+    a recursion problem as soon as it is executed.
+
+    To avoid this, applying the decorator will make it so that the engine will
+    acknowledge this is the case, and will *expand* the schema only when it is
+    needed. No recursion problems will happen then since we are effectively
+    delaying its execution.
+    """
+    func.__delayed__ = True
+    return func
