@@ -32,7 +32,6 @@ class TestAnyItem(object):
         msg = "-> list[]  did not contain any valid items matching 'a'"
         assert exc.value.args[0] == msg
 
-
     def test_any_item_pass(self):
         data = [1, 2, 6, 4, 5]
         schema = 6
@@ -44,6 +43,24 @@ class TestAnyItem(object):
         schema = 6
         any_item = iterables.AnyItem(schema)
         assert  any_item(data, []) is None
+
+    def test_any_item_fail_on_non_lists(self):
+        data = 4
+        schema = 1
+        all_items = iterables.AnyItem(schema)
+        with raises(Invalid) as exc:
+            all_items(data, [])
+        error = exc.value.args[0]
+        assert  'top level did not match 1' in error
+
+    def test_expecting_list_error(self):
+        data = 4
+        schema = 1
+        all_items = iterables.AnyItem(schema)
+        with raises(Invalid) as exc:
+            all_items(data, [])
+        assert 'expected a list but got int' == exc.value.reason
+
 
 
 class TestAllItems(object):
@@ -58,10 +75,18 @@ class TestAllItems(object):
         data = 4
         schema = 1
         all_items = iterables.AllItems(schema)
-        with raises(SchemaError) as exc:
+        with raises(Invalid) as exc:
             all_items(data, [])
         error = exc.value.args[0]
-        assert  'top level AllItems needs a list to validate' in error
+        assert  'top level did not match 1' in error
+
+    def test_expecting_list_error(self):
+        data = 4
+        schema = 1
+        all_items = iterables.AllItems(schema)
+        with raises(Invalid) as exc:
+            all_items(data, [])
+        assert 'expected a list but got int' == exc.value.reason
 
     def test_all_items_fail(self):
         data = [1, 1, 3, 1]
