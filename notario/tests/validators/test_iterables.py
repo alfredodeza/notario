@@ -51,7 +51,7 @@ class TestAnyItem(object):
         with raises(Invalid) as exc:
             all_items(data, [])
         error = exc.value.args[0]
-        assert  'top level did not match 1' in error
+        assert  'top level did not pass validation against callable: AnyItem' in error
 
     def test_expecting_list_error(self):
         data = 4
@@ -78,7 +78,7 @@ class TestAllItems(object):
         with raises(Invalid) as exc:
             all_items(data, [])
         error = exc.value.args[0]
-        assert  'top level did not match 1' in error
+        assert  'top level did not pass validation against callable: AllItems' in error
 
     def test_expecting_list_error(self):
         data = 4
