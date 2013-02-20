@@ -103,3 +103,14 @@ def data_item(data):
     elif isinstance(data, list):
         return repr(data[0])
     return repr(data)
+
+
+def forced_leaf_validator(func):
+    """
+    Some decorators may need to use this if doing anything related
+    with a dictionary value. Since callables are usually validating
+    single values (e.g. a string or a boolean) and not a dictionary
+    per-se because Notario will already normalize the data.
+    """
+    func.__validator_leaf__ = True
+    return func
