@@ -120,3 +120,16 @@ class TestExpandSchema(object):
         def my_schema():
             return 'a', 'b'
         assert utils.expand_schema(my_schema) == ('a', 'b')
+
+
+class TestIsSchema(object):
+
+    def test_if_is_tuple(self):
+        assert utils.is_schema(('a', 'b')) is True
+
+    def test_is_delayed(self):
+        schema = delay(lambda x: True)
+        assert utils.is_schema(schema) is True
+
+    def test_is_not_tuple(self):
+        assert utils.is_schema([]) is False
