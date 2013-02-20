@@ -63,6 +63,17 @@ class Invalid(NotarioException):
         return "%s %s" % (self._format_path(), self._format_message())
 
 
+class NestedInvalid(Invalid):
+    """
+    When a validator is deeply nested, (e.g. a recursive inside an iterable)
+    catching exceptions for better reporting is very difficult because of how
+    most are caught and re-written to accomodate a tree.  This exception will
+    probably be useful only to those types of validators, that need to raise an
+    ``Invalid`` exception that should not be re-written in any way.
+    """
+    pass
+
+
 class SchemaError(NotarioException):
 
     def _get_message(self):
