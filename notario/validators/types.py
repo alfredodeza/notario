@@ -3,6 +3,7 @@ Basic type validators
 """
 from functools import wraps
 from notario._compat import basestring
+from notario.exceptions import Invalid
 from notario.utils import is_callable, forced_leaf_validator
 
 
@@ -79,15 +80,22 @@ def dictionary(_object, *args):
         triggered, otherwise it will act as a normal function.
 
     """
+    error_msg = 'not of type dictionary'
     if is_callable(_object):
         _validator = _object
 
         @wraps(_validator)
         def decorated(value):
-            assert isinstance(value, dict), "not of type dictionary"
+            assert isinstance(value, dict), error_msg
             return _validator(value)
         return decorated
-    assert isinstance(_object, dict), "not of type dictionary"
+    try:
+        assert isinstance(_object, dict), error_msg
+    except AssertionError:
+        if args:
+            msg = 'did not pass validation against callable: dictionary'
+            raise Invalid('', msg=msg, reason=error_msg, *args)
+        raise
 
 
 def array(_object):
