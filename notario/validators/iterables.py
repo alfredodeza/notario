@@ -2,7 +2,7 @@
 Iterable validators for array objects only. They provide a way of
 applying a schema to any given items in an array.
 """
-from notario.exceptions import Invalid, SchemaError
+from notario.exceptions import NestedInvalid, Invalid
 from notario.engine import IterableValidator
 from notario.utils import is_callable, safe_repr
 
@@ -26,8 +26,10 @@ class BasicIterableValidator(object):
         base class expect data to be of type ``list``.
         """
         if not isinstance(data, list):
+            name = self.__class__.__name__
+            msg = "did not pass validation against callable: %s" % name
             reason = 'expected a list but got %s' % safe_repr(data)
-            raise Invalid(self.schema, tree, reason=reason, pair='value')
+            raise NestedInvalid(self.schema, tree, reason=reason, pair='value', msg=msg)
 
 
 class AnyItem(BasicIterableValidator):
