@@ -1,5 +1,5 @@
 from notario.exceptions import Invalid
-from notario.utils import safe_repr
+from notario.utils import safe_repr, expand_schema, is_schema
 from notario.engine import RecursiveValidator
 
 
@@ -59,8 +59,9 @@ class AnyObject(BasicRecursiveValidator):
     """
 
     def __call__(self, data, tree):
+        schema = expand_schema(self.schema)
         index = len(data) - 1
-        validator = RecursiveValidator(data, self.schema, [], index=index)
+        validator = RecursiveValidator(data, schema, [], index=index)
         for item_index in range(len(data)):
             try:
                 return validator.leaf(item_index)
@@ -70,7 +71,7 @@ class AnyObject(BasicRecursiveValidator):
                 pass
 
         msg = "did not contain any valid objects against callable: %s" % self.__class__.__name__
-        raise Invalid(self.schema, tree, pair='value', msg=msg)
+        raise Invalid(schema, tree, pair='value', msg=msg)
 
 
 class AllObjects(BasicRecursiveValidator):
@@ -118,7 +119,8 @@ class AllObjects(BasicRecursiveValidator):
     """
 
     def __call__(self, data, tree):
-        validator = RecursiveValidator(data, self.schema, tree)
+        schema = expand_schema(self.schema)
+        validator = RecursiveValidator(data, schema, tree)
         validator.validate()
 
 
@@ -169,7 +171,7 @@ class MultiSchema(object):
 
     def __init__(self, *schemas):
         for schema in schemas:
-            if not isinstance(schema, tuple):
+            if not is_schema(schema):
                 raise TypeError("got a non schema argument: %s" % safe_repr(schema))
         self.schemas = schemas
 
@@ -187,8 +189,9 @@ class MultiSchema(object):
         :param tree: The traversing tree up to this point, always passed in.
         :raises Invalid: If none of the schemas can validate the data.
         """
+        first_schema = expand_schema(self.schemas[0])
         index = len(data) - 1
-        validator = RecursiveValidator(data, self.schemas[0], [], index=index)
+        validator = RecursiveValidator(data, first_schema, [], index=index)
         for item_index in range(len(data)):
             try:
                 validator.leaf(item_index)
@@ -198,7 +201,7 @@ class MultiSchema(object):
     def itemized_validation(self, validator, item_index):
         for schema in self.schemas:
             try:
-                validator.schema = schema
+                validator.schema = expand_schema(schema)
                 validator.tree = []
                 return validator.leaf(item_index)
             except Invalid, error:
