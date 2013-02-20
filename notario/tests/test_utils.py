@@ -1,5 +1,6 @@
 from notario.normal import Data
 from notario import utils
+from notario.decorators import delay
 
 
 class TestIsCallable(object):
@@ -106,3 +107,16 @@ class TestDataItem(object):
 
     def test_fallback_to_repr_of_obj(self):
         assert utils.data_item(self.ndict) == "{}"
+
+
+class TestExpandSchema(object):
+
+    def test_not_delayed(self):
+        schema = ('a', 'b')
+        assert utils.expand_schema(schema) == schema
+
+    def test_is_delayed(self):
+        @delay
+        def my_schema():
+            return 'a', 'b'
+        assert utils.expand_schema(my_schema) == ('a', 'b')
