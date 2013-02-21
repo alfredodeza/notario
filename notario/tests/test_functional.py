@@ -192,6 +192,15 @@ class TestWithIterableValidators(object):
         assert 'did not pass validation against callable: integer'
         assert exc.value.reason == 'expected a list but got dict'
 
+    def test_nested_raises_nested_invalid(self):
+        data = {'a': [{'a': ['a']}, {'b': 'c'}]}
+        nested_schema = iterables.MultiIterable(('a', ['b']), ('b', 'c'))
+        schema = ('a', iterables.AllItems(nested_schema))
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        error = exc.value.args[0]
+        assert "did not match 'b'" in error
+
     def test_any_items_pass(self):
         data = {'a': [1, 2, 'a string', 4, 5]}
         schema = ('a', iterables.AnyItem(types.string))

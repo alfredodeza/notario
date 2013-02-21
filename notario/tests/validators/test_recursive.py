@@ -61,30 +61,30 @@ class TestMultiSchema(object):
         data = Data({'a': 2}, {}).normalized()
         schemas = (('a', 2), ('b', 1))
 
-        multi = recursive.MultiSchema(*schemas)
+        multi = recursive.MultiRecursive(*schemas)
         assert multi(data, []) is None
 
     def test_fail_on_non_callable(self):
         with raises(TypeError):
-            recursive.MultiSchema(False)
+            recursive.MultiRecursive(False)
 
     def test_pass_two_data_items(self):
         data = Data({'a': 2, 'b': 1}, {}).normalized()
         schemas = (('a', 2), ('b', 1))
 
-        multi = recursive.MultiSchema(*schemas)
+        multi = recursive.MultiRecursive(*schemas)
         assert multi(data, []) is None
 
     def test_pass_on_second_schema(self):
         data = Data({'b': 1}, {}).normalized()
-        multi = recursive.MultiSchema(('a', 2), ('b', 1))
+        multi = recursive.MultiRecursive(('a', 2), ('b', 1))
         assert multi(data, []) is None
 
     def test_fail_on_last_schema(self):
         data = Data({'a': 2, 'b': 1}, {}).normalized()
         schemas = (('a', 2), ('b', 2))
 
-        multi = recursive.MultiSchema(*schemas)
+        multi = recursive.MultiRecursive(*schemas)
         with raises(Invalid) as exc:
             multi(data, [])
         assert '1  did not match 2' in exc.value.args[0]
@@ -93,21 +93,21 @@ class TestMultiSchema(object):
         data = Data({'a': 2, 'b': 1}, {}).normalized()
         schemas = (('a', 2), ('b', 2), ('b', 1))
 
-        multi = recursive.MultiSchema(*schemas)
+        multi = recursive.MultiRecursive(*schemas)
         assert multi(data, []) is None
 
     def test_pass_single_on_third_schema(self):
         data = Data({'z': 2}, {}).normalized()
         schemas = (('a', 2), ('b', 2), ('z', 2))
 
-        multi = recursive.MultiSchema(*schemas)
+        multi = recursive.MultiRecursive(*schemas)
         assert multi(data, []) is None
 
     def test_fail_single_on_third_schema(self):
         data = Data({'z': 2}, {}).normalized()
         schemas = (('a', 2), ('b', 2), ('z', 1))
 
-        multi = recursive.MultiSchema(*schemas)
+        multi = recursive.MultiRecursive(*schemas)
         with raises(Invalid) as exc:
             multi(data, [])
         assert 'z -> 2  did not match 1' in exc.value.args[0]
