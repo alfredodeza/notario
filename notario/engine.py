@@ -161,6 +161,9 @@ class IterableValidator(BaseItemValidator):
             self.enforce(data, schema, item_index, tree)
 
     def enforce(self, data, schema, item_index, tree):
+        # yo dawg, a recursive validator within a recursive validator anyone?
+        if is_callable(schema) and hasattr(schema, '__validator_leaf__'):
+            return schema(data, tree)
         if isinstance(data[item_index], dict) and isinstance(schema, tuple):
             try:
                 _validator = Validator(data[item_index], schema)
