@@ -2,7 +2,7 @@
 Iterable validators for array objects only. They provide a way of
 applying a schema to any given items in an array.
 """
-from notario.exceptions import Invalid
+from notario.exceptions import Invalid, SchemaError
 from notario.engine import IterableValidator
 from notario.utils import is_callable, safe_repr, expand_schema, is_schema
 
@@ -211,12 +211,12 @@ class MultiIterable(object):
         """
         first_schema = expand_schema(self.schemas[0])
         index = len(data) - 1
-        validator = IterableValidator(data, first_schema, [], index=index, name='MultiIterable')
+        validator = IterableValidator(data, first_schema, tree, index=index, name='MultiIterable')
 
         for item_index in range(len(data)):
             try:
                 validator.leaf(item_index)
-            except Invalid:
+            except (SchemaError, Invalid):
                 self.itemized_validation(validator, item_index)
 
     def itemized_validation(self, validator, item_index):
@@ -225,6 +225,6 @@ class MultiIterable(object):
                 validator.schema = expand_schema(schema)
                 validator.tree = []
                 return validator.leaf(item_index)
-            except Invalid, error:
+            except (SchemaError, Invalid), error:
                 error = error
         raise error
