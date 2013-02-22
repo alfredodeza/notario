@@ -50,6 +50,12 @@ class Validator(object):
             if tree:
                 tree.pop()
 
+        # XXX There is a chance we might have missing items from
+        # the incoming data that are labeled as required from the schema
+        # we should make sure *here* that we account for that and raise
+        # the appropriate exception. Since the loop finished and everything
+        # seems to have passed, this lack of check will give false positives.
+
     def key_leaf(self, data, schema, tree):
         """
         The deepest validation we can make in any given circumstance for a key.
