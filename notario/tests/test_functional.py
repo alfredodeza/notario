@@ -198,8 +198,7 @@ class TestWithIterableValidators(object):
         schema = ('a', iterables.AllItems(nested_schema))
         with raises(Invalid) as exc:
             validate(data, schema)
-        error = exc.value.args[0]
-        assert "did not match 'b'" in error
+        assert exc.value.reason == 'expected a list but got dict'
 
     def test_any_items_pass(self):
         data = {'a': [1, 2, 'a string', 4, 5]}
