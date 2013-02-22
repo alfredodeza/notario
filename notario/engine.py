@@ -12,8 +12,9 @@ class Validator(object):
         self.schema = Schema(data, schema).normalized()
 
     def validate(self):
-        self.length_equality(self.data, self.schema, 0, [])
-        self.traverser(self.data, self.schema, [])
+        schema = self.sanitize_optionals(self.data, self.schema, [])
+        self.length_equality(self.data, schema, 0, [])
+        self.traverser(self.data, schema, [])
 
     def traverser(self, data, schema, tree):
         """
@@ -29,8 +30,6 @@ class Validator(object):
                 reason = "must_validate attribute must not be empty"
                 raise SchemaError(data, tree, reason=reason)
             data = sift(data, schema.must_validate)
-
-        schema = self.sanitize_optionals(data, schema, tree)
 
         for index in range(len(data)):
             self.length_equality(data, schema, index, tree)
@@ -74,6 +73,19 @@ class Validator(object):
         enforce(value, schema_value, tree, 'value')
 
     def length_equality(self, data, schema, index, tree):
+        # FIXME This can cause TypeError
+        if not hasattr(schema, 'must_validate'):
+            if len(data) > len(schema):
+                reason = 'has unexpected item in data: %s' % data_item(data)
+                raise Invalid(schema[index], tree, msg=reason, reason=reason, pair='value')
+            if len(data) < len(schema):
+                reason = 'is missing required items'
+                raise Invalid(schema[index], tree, msg=reason, reason=reason, pair='value')
+            if hasattr(schema, '__validator_leaf__'):
+                return
+            if len(data) != len(schema):
+                raise SchemaError(data, tree, reason='length did not match schema')
+
         try:
             data = data[index]
             try:
@@ -88,6 +100,7 @@ class Validator(object):
                 raise SchemaError(data, tree, reason=reason)
         if hasattr(schema, '__validator_leaf__'):
             return
+
         if len(data) != len(schema):
             raise SchemaError(data, tree, reason='length did not match schema')
 
@@ -163,7 +176,7 @@ class IterableValidator(BaseItemValidator):
     def enforce(self, data, schema, item_index, tree):
         # yo dawg, a recursive validator within a recursive validator anyone?
         if is_callable(schema) and hasattr(schema, '__validator_leaf__'):
-            return schema(data, tree)
+            return schema(data[item_index], tree)
         if isinstance(data[item_index], dict) and isinstance(schema, tuple):
             try:
                 _validator = Validator(data[item_index], schema)
