@@ -12,9 +12,7 @@ class Validator(object):
         self.schema = Schema(data, schema).normalized()
 
     def validate(self):
-        schema = self.sanitize_optionals(self.data, self.schema, [])
-        self.length_equality(self.data, schema, 0, [])
-        self.traverser(self.data, schema, [])
+        self.traverser(self.data, self.schema, [])
 
     def traverser(self, data, schema, tree):
         """
@@ -22,6 +20,7 @@ class Validator(object):
         it sees appropriate key/value pairs that indicate that
         there is a need for more validation in a branch below us.
         """
+
         if hasattr(schema, '__validator_leaf__'):
             return schema(data, tree)
 
@@ -30,6 +29,8 @@ class Validator(object):
                 reason = "must_validate attribute must not be empty"
                 raise SchemaError(data, tree, reason=reason)
             data = sift(data, schema.must_validate)
+
+        schema = self.sanitize_optionals(data, schema, tree)
 
         for index in range(len(data)):
             self.length_equality(data, schema, index, tree)
@@ -73,19 +74,6 @@ class Validator(object):
         enforce(value, schema_value, tree, 'value')
 
     def length_equality(self, data, schema, index, tree):
-        # FIXME This can cause TypeError
-        if not hasattr(schema, 'must_validate'):
-            if len(data) > len(schema):
-                reason = 'has unexpected item in data: %s' % data_item(data)
-                raise Invalid(schema[index], tree, msg=reason, reason=reason, pair='value')
-            if len(data) < len(schema):
-                reason = 'is missing required items'
-                raise Invalid(schema[index], tree, msg=reason, reason=reason, pair='value')
-            if hasattr(schema, '__validator_leaf__'):
-                return
-            if len(data) != len(schema):
-                raise SchemaError(data, tree, reason='length did not match schema')
-
         try:
             data = data[index]
             try:
