@@ -1,3 +1,5 @@
+from pytest import raises
+
 from notario.normal import Data
 from notario import utils
 from notario.decorators import delay
@@ -133,3 +135,13 @@ class TestIsSchema(object):
 
     def test_is_not_tuple(self):
         assert utils.is_schema([]) is False
+
+
+class TestEnsure(object):
+
+    def test_ensure(self):
+        assert utils.ensure(1 == 1)
+
+    def test_ensure_raises_assertionerror(self):
+        with raises(AssertionError):
+            utils.ensure(0 == 1)
