@@ -49,9 +49,10 @@ class Hybrid(object):
     .. doctest:: Hybrid
 
         >>> from notario.validators import Hybrid
+        >>> from notario.utils import ensure
         >>> from notario import validate
         >>> def validator(value):
-            ... assert isinstance(value, bool)
+            ... ensure(isinstance(value, bool))
             ...
         >>> schema = ('a', Hybrid(validator, ('a', 1)))
         >>> data = {'a', False}

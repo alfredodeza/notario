@@ -1,7 +1,7 @@
 import sys
 from notario.exceptions import Invalid, SchemaError
 from notario.utils import (is_callable, sift, is_empty, re_sort, is_not_empty,
-                           data_item, safe_repr)
+                           data_item, safe_repr, ensure)
 from notario.normal import Data, Schema
 
 
@@ -195,7 +195,7 @@ class IterableValidator(BaseItemValidator):
                 if is_callable(schema):
                     schema(data[item_index])
                 else:
-                    assert data[item_index] == schema
+                    ensure(data[item_index] == schema)
             except AssertionError:
                 reason = sys.exc_info()[1]
                 tree.append('list[%s]' % item_index)
@@ -248,9 +248,9 @@ def enforce(data_item, schema_item, tree, pair):
             if schema_is_optional:
                 if is_empty(data_item):  # we received nothing here
                     return
-                assert data_item == schema_item()
+                ensure(data_item == schema_item())
             else:
-                assert data_item == schema_item
+                ensure(data_item == schema_item)
         except AssertionError:
             e = sys.exc_info()[1]
             if pair == 'value':
