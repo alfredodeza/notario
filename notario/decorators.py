@@ -12,7 +12,7 @@ class instance_of(object):
     For example, if the input for a given validator can be either a dictionary
     or a list, this validator could be used like::
 
-        from notario.utils import ensure
+        from notario import ensure
         @instance_of((list, dict))
         def my_validator(value):
             ensure(len(value) > 0)
@@ -21,7 +21,7 @@ class instance_of(object):
     which is: ``(list, dict, str)``. A working implementation would look like
     this with the default types::
 
-        from notario.utils import ensure
+        from notario import ensure
         @instance_of()
         def my_validator(value):
             ensure(len(value) > 0)
@@ -33,7 +33,7 @@ class instance_of(object):
     .. doctest:: instance_of
 
         >>> from notario.decorators import instance_of
-        >>> from notario.utils import ensure
+        >>> from notario import ensure
         >>> @instance_of()
         ... def my_validator(value):
         ...     ensure(len(value) == 2)
