@@ -4,7 +4,7 @@ Basic type validators
 from functools import wraps
 from notario._compat import basestring
 from notario.exceptions import Invalid
-from notario.utils import is_callable, forced_leaf_validator
+from notario.utils import is_callable, forced_leaf_validator, ensure
 
 
 def string(_object):
@@ -28,10 +28,10 @@ def string(_object):
 
         @wraps(_validator)
         def decorated(value):
-            assert isinstance(value, basestring), "not of type string"
+            ensure(isinstance(value, basestring), "not of type string")
             return _validator(value)
         return decorated
-    assert isinstance(_object, basestring), "not of type string"
+    ensure(isinstance(_object, basestring), "not of type string")
 
 
 def boolean(_object):
@@ -56,10 +56,10 @@ def boolean(_object):
 
         @wraps(_validator)
         def decorated(value):
-            assert isinstance(value, bool), "not of type boolean"
+            ensure(isinstance(value, bool), "not of type boolean")
             return _validator(value)
         return decorated
-    assert isinstance(_object, bool), "not of type boolean"
+    ensure(isinstance(_object, bool), "not of type boolean")
 
 
 @forced_leaf_validator
@@ -86,11 +86,11 @@ def dictionary(_object, *args):
 
         @wraps(_validator)
         def decorated(value):
-            assert isinstance(value, dict), error_msg
+            ensure(isinstance(value, dict), error_msg)
             return _validator(value)
         return decorated
     try:
-        assert isinstance(_object, dict), error_msg
+        ensure(isinstance(_object, dict), error_msg)
     except AssertionError:
         if args:
             msg = 'did not pass validation against callable: dictionary'
@@ -120,10 +120,10 @@ def array(_object):
 
         @wraps(_validator)
         def decorated(value):
-            assert isinstance(value, list), "not of type array"
+            ensure(isinstance(value, list), "not of type array")
             return _validator(value)
         return decorated
-    assert isinstance(_object, list), "not of type array"
+    ensure(isinstance(_object, list), "not of type array")
 
 
 def integer(_object):
@@ -147,7 +147,7 @@ def integer(_object):
 
         @wraps(_validator)
         def decorated(value):
-            assert isinstance(value, int), "not of type int"
+            ensure(isinstance(value, int), "not of type int")
             return _validator(value)
         return decorated
-    assert isinstance(_object, int), "not of type int"
+    ensure(isinstance(_object, int), "not of type int")

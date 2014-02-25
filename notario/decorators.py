@@ -1,5 +1,5 @@
 from functools import wraps
-from notario.utils import is_callable, safe_repr
+from notario.utils import is_callable, safe_repr, ensure
 
 
 class instance_of(object):
@@ -12,17 +12,19 @@ class instance_of(object):
     For example, if the input for a given validator can be either a dictionary
     or a list, this validator could be used like::
 
+        from notario import ensure
         @instance_of((list, dict))
         def my_validator(value):
-            assert len(value) > 0
+            ensure(len(value) > 0)
 
     This decorator **needs** to be called as it has a default for valid types,
     which is: ``(list, dict, str)``. A working implementation would look like
     this with the default types::
 
+        from notario import ensure
         @instance_of()
         def my_validator(value):
-            assert len(value) > 0
+            ensure(len(value) > 0)
 
     When it fails, as almost all of Notario's exceptions, it will return
     a meaningful error, this is how passing a boolean to a validator that
@@ -31,9 +33,10 @@ class instance_of(object):
     .. doctest:: instance_of
 
         >>> from notario.decorators import instance_of
+        >>> from notario import ensure
         >>> @instance_of()
         ... def my_validator(value):
-        ...     assert len(value) == 2
+        ...     ensure(len(value) == 2)
         ...
         >>> my_validator(True)
         Traceback (most recent call last):
@@ -48,7 +51,7 @@ class instance_of(object):
         fail_msg = "not of any valid types: %s" % self.valid_names()
 
         def decorated(value):
-            assert isinstance(value, self.valid_types), fail_msg
+            ensure(isinstance(value, self.valid_types), fail_msg)
             func(value)
         return decorated
 
@@ -71,11 +74,11 @@ def not_empty(_object):
         @wraps(_validator)
         @instance_of()
         def decorated(value):
-            assert value, "%s is empty" % safe_repr(value)
+            ensure(value, "%s is empty" % safe_repr(value))
             return _validator(value)
         return decorated
     try:
-        assert len(_object), "%s is empty" % safe_repr(_object)
+        ensure(len(_object), "%s is empty" % safe_repr(_object))
     except TypeError:
         raise AssertionError("not of any valid types: [list, dict, str]")
 

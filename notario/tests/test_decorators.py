@@ -104,4 +104,3 @@ class TestNotEmpty(object):
         exc_msg = exc.value[0]
 
         assert 'not two' in exc_msg
-
