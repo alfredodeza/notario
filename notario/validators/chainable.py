@@ -50,7 +50,7 @@ class AllIn(BasicChainValidator):
         for validator in self.args:
             try:
                 validator(value)
-            except AssertionError, exc:
+            except AssertionError as exc:
                 self.__name__ = 'AllIn -> %s' % validator.__name__
                 raise AssertionError(exc)
 

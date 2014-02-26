@@ -199,11 +199,15 @@ class MultiRecursive(object):
                 self.itemized_validation(validator, item_index)
 
     def itemized_validation(self, validator, item_index):
+        error = None
+
         for schema in self.schemas:
             try:
                 validator.schema = expand_schema(schema)
                 validator.tree = []
                 return validator.leaf(item_index)
-            except Invalid, error:
-                error = error
-        raise error
+            except Invalid as e:
+                error = e
+
+        if error is not None:
+            raise error
