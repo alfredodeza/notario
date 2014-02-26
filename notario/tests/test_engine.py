@@ -263,5 +263,6 @@ class TestOptionalKeys(object):
         validator = engine.Validator(data, schema)
         with raises(Invalid) as exc:
             validator.validate()
-        assert '3  did not match 2' in exc.value[0]
-        assert 'b -> 3' in exc.value[0]
+        exc_msg = str(exc.value)
+        assert '3  did not match 2' in exc_msg
+        assert 'b -> 3' in exc_msg

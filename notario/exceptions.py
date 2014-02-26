@@ -1,3 +1,4 @@
+from notario._compat import basestring
 from notario.utils import is_callable
 
 

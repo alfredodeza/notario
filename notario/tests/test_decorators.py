@@ -11,7 +11,7 @@ class TestInstanceOf(object):
 
         with raises(AssertionError) as exc:
             validator(0)
-        exc_msg = exc.value[0]
+        exc_msg = str(exc.value)
 
         assert 'not of any valid types' in exc_msg
         assert 'list' in exc_msg
@@ -25,7 +25,7 @@ class TestInstanceOf(object):
 
         with raises(AssertionError) as exc:
             validator({})
-        exc_msg = exc.value[0]
+        exc_msg = str(exc.value)
 
         assert 'not of any valid types' in exc_msg
         assert 'str' in exc_msg
@@ -40,7 +40,7 @@ class TestInstanceOf(object):
 
         with raises(AssertionError) as exc:
             validator({})
-        exc_msg = exc.value[0]
+        exc_msg = str(exc.value)
 
         assert 'not of any valid types' in exc_msg
         assert 'Foo' in exc_msg
@@ -61,7 +61,7 @@ class TestNotEmpty(object):
 
         with raises(AssertionError) as exc:
             validator({})
-        exc_msg = exc.value[0]
+        exc_msg = str(exc.value)
 
         assert 'is empty' in exc_msg
 
@@ -72,7 +72,7 @@ class TestNotEmpty(object):
 
         with raises(AssertionError) as exc:
             validator("")
-        exc_msg = exc.value[0]
+        exc_msg = str(exc.value)
 
         assert 'is empty' in exc_msg
 
@@ -83,14 +83,14 @@ class TestNotEmpty(object):
 
         with raises(AssertionError) as exc:
             validator([])
-        exc_msg = exc.value[0]
+        exc_msg = str(exc.value)
 
         assert 'is empty' in exc_msg
 
     def test_non_decorator_empty_string(self):
         with raises(AssertionError) as exc:
             decorators.not_empty("")
-        exc_msg = exc.value[0]
+        exc_msg = str(exc.value)
 
         assert 'is empty' in exc_msg
 
@@ -101,6 +101,6 @@ class TestNotEmpty(object):
 
         with raises(AssertionError) as exc:
             validator([1])
-        exc_msg = exc.value[0]
+        exc_msg = str(exc.value)
 
         assert 'not two' in exc_msg
