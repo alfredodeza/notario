@@ -266,3 +266,10 @@ class TestOptionalKeys(object):
         exc_msg = str(exc.value)
         assert '3  did not match 2' in exc_msg
         assert 'b -> 3' in exc_msg
+
+
+class TestValidate(object):
+
+    def test_refuses_non_dicts(self):
+        with raises(TypeError):
+            engine.validate(['a list'], ('a', 'b'))
