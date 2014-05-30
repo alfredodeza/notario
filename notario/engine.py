@@ -265,5 +265,8 @@ def validate(data, schema):
     :param data: The incoming data, as a dictionary object.
     :param schema: The schema from which data will be validated against
     """
-    validator = Validator(data, schema)
-    validator.validate()
+    if isinstance(data, dict):
+        validator = Validator(data, schema)
+        validator.validate()
+    else:
+        raise TypeError('expected data to be of type dict, but got: %s' % type(data))
