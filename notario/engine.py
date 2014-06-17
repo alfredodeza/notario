@@ -12,6 +12,9 @@ class Validator(object):
         self.schema = Schema(data, schema).normalized()
 
     def validate(self):
+        if self.data == {} and self.schema:
+            reason = 'has no data to validate against schema'
+            raise Invalid(None, {}, msg=reason, reason=reason, pair='value')
         self.traverser(self.data, self.schema, [])
 
     def traverser(self, data, schema, tree):
@@ -20,7 +23,6 @@ class Validator(object):
         it sees appropriate key/value pairs that indicate that
         there is a need for more validation in a branch below us.
         """
-
         if hasattr(schema, '__validator_leaf__'):
             return schema(data, tree)
 
