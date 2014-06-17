@@ -1,4 +1,15 @@
-0.1.0
+0.0.7
+-----
+* Fix odd spacing in error messages
+
+0.0.6
+-----
+Note this entry does not refelct fully the features in 0.0.6
+* Python 3 compatibility
+* Replace use of asserts with wrapped ensure() to deal with python -O
+* creates a utility to validate called ``ensure``
+
+0.0.5
 -----
 If you could summarize a *wealth* of new features, it would be this release!
 
