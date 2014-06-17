@@ -85,7 +85,7 @@ class TestValidator(object):
             validator.validate()
 
         error = exc.value.args[0]
-        assert  '-> b -> 2  did not match 1' in error
+        assert  '-> b -> 2 did not match 1' in error
 
     def test_validate_value_nested_dictionaries(self):
         data = {'a': 1, 'b': {'a': 2, 'b' : 1}}
@@ -95,7 +95,7 @@ class TestValidator(object):
             validator.validate()
 
         error = exc.value.args[0]
-        assert  '-> b -> b -> 1  did not match 2' in error
+        assert  '-> b -> b -> 1 did not match 2' in error
 
     def test_validate_key_doubly_nested_dictionaries(self):
         data = {'a': 1, 'b': {'a': 2, 'b' : {'a':'a'}}}
@@ -105,7 +105,7 @@ class TestValidator(object):
             validator.validate()
 
         error = exc.value.args[0]
-        assert  "-> b -> b -> a -> a  did not match 'b'" in error
+        assert  "-> b -> b -> a -> a did not match 'b'" in error
 
     def test_validate_key_nested_dictionaries(self):
         data = {'a': 1, 'b': {'a': 2, 'b' : 1}}
@@ -125,7 +125,7 @@ class TestValidator(object):
             validator.validate()
 
         error = exc.value.args[0]
-        assert  '-> b -> b -> [1, 2, 3]  did not match [1, 1, 3]' in error
+        assert  '-> b -> b -> [1, 2, 3] did not match [1, 1, 3]' in error
 
     def test_validate_key_nested_arrays(self):
         data = {'a': 1, 'b': {'a': 2, 'b' : [1, 2, 3]}}
@@ -135,7 +135,7 @@ class TestValidator(object):
             validator.validate()
 
         error = exc.value.args[0]
-        assert  '-> b -> b -> [1, 2, 3]  did not match [1, 1, 3]' in error
+        assert  '-> b -> b -> [1, 2, 3] did not match [1, 1, 3]' in error
 
     def test_validate_multiple_items_as_values(self):
         data = {'a': 1, 'b': {'a': 2, 'b' : 1, 'd':1, 'c':2}}
@@ -145,7 +145,7 @@ class TestValidator(object):
             validator.validate()
 
         error = exc.value.args[0]
-        assert  '-> b -> d -> 1  did not match 2' in error in error
+        assert  '-> b -> d -> 1 did not match 2' in error in error
 
 
 class TestValidatorLeaves(object):
@@ -172,7 +172,7 @@ class TestValidatorLeaves(object):
             validator.validate()
 
         error = exc.value.args[0]
-        assert  '-> a -> b -> [1, 1, 1, 1]  did not match [1, 1, 1, 2]' in error
+        assert  '-> a -> b -> [1, 1, 1, 1] did not match [1, 1, 1, 2]' in error
 
 
 class TestRecursiveValidator(object):
@@ -195,7 +195,7 @@ class TestRecursiveValidator(object):
             validator.validate()
 
         error = exc.value.args[0]
-        assert '1  did not pass validation against callable: string' in error
+        assert '1 did not pass validation against callable: string' in error
         assert 'not of type string' in error
 
 
@@ -218,7 +218,7 @@ class TestIterableValidator(object):
             iter_validator.validate()
 
         error = exc.value.args[0]
-        assert  "-> list[0] -> a -> a  did not match 'b'" in error
+        assert  "-> list[0] -> a -> a did not match 'b'" in error
 
     def test_validate_nested_array(self):
         data = [{'a':'b'}, {'b': 'c'}]
@@ -228,7 +228,7 @@ class TestIterableValidator(object):
             iter_validator.validate()
 
         error = exc.value.args[0]
-        assert  "-> list[1] -> b -> c  did not match 'b'" in error
+        assert  "-> list[1] -> b -> c did not match 'b'" in error
 
     def test_report_schema_errors(self):
         data = [1,2,3,4]
@@ -264,7 +264,7 @@ class TestOptionalKeys(object):
         with raises(Invalid) as exc:
             validator.validate()
         exc_msg = str(exc.value)
-        assert '3  did not match 2' in exc_msg
+        assert '3 did not match 2' in exc_msg
         assert 'b -> 3' in exc_msg
 
 
