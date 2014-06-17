@@ -22,7 +22,7 @@ class TestHybrid(object):
         with raises(Invalid) as exc:
             hybrid(0)
         error = exc.value.args[0]
-        assert '0  did not pass validation against callable' in error
+        assert '0 did not pass validation against callable' in error
 
     def test_use_schema_passes(self):
         schema = ('a', 1)
@@ -35,7 +35,7 @@ class TestHybrid(object):
         with raises(Invalid) as exc:
             hybrid({0: ('a', 1)})
         error = exc.value.args[0]
-        assert 'a -> 1  did not match 2' in error
+        assert 'a -> 1 did not match 2' in error
 
 
 class TestFunctional(object):
@@ -59,7 +59,7 @@ class TestFunctional(object):
         with raises(Invalid) as exc:
             validate(data, schema)
         error = exc.value.args[0]
-        assert '1 -> 2  did not match 1' in error
+        assert '1 -> 2 did not match 1' in error
         assert error.startswith('-> a -> 1')
 
     def test_extra_unexpected_items(self):
@@ -69,5 +69,5 @@ class TestFunctional(object):
         with raises(Invalid) as exc:
             validate(data, schema)
         error = exc.value.args[0]
-        assert '-> a  did not match {}' in error
+        assert '-> a did not match {}' in error
         assert exc.value.reason == 'unexpected extra items'

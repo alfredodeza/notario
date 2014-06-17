@@ -11,7 +11,7 @@ class TestAnyItem(object):
         with raises(Invalid) as exc:
             any_item = iterables.AnyItem(schema)
             any_item(data, [])
-        msg = '-> list[]  did not contain any valid items matching 7'
+        msg = '-> list[] did not contain any valid items matching 7'
         assert exc.value.args[0] == msg
 
     def test_tuple_schemas_cannot_run_on_single_values(self):
@@ -29,7 +29,7 @@ class TestAnyItem(object):
         with raises(Invalid) as exc:
             any_item = iterables.AnyItem(schema)
             any_item(data, [])
-        msg = "-> list[]  did not contain any valid items matching 'a'"
+        msg = "-> list[] did not contain any valid items matching 'a'"
         assert exc.value.args[0] == msg
 
     def test_any_item_pass(self):

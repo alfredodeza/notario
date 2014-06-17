@@ -13,7 +13,7 @@ class TestAllObjects(object):
         with raises(Invalid) as exc:
             any_object = recursive.AllObjects(schema)
             any_object(data, [])
-        msg = '-> a -> 1  did not pass validation against callable: integer'
+        msg = '-> a -> 1 did not pass validation against callable: integer'
         error = exc.value.args[0]
         assert msg in error
         assert 'not of type int' in error
@@ -87,7 +87,7 @@ class TestMultiSchema(object):
         multi = recursive.MultiRecursive(*schemas)
         with raises(Invalid) as exc:
             multi(data, [])
-        assert '1  did not match 2' in exc.value.args[0]
+        assert '1 did not match 2' in exc.value.args[0]
 
     def test_pass_on_third_schema(self):
         data = Data({'a': 2, 'b': 1}, {}).normalized()
@@ -110,5 +110,5 @@ class TestMultiSchema(object):
         multi = recursive.MultiRecursive(*schemas)
         with raises(Invalid) as exc:
             multi(data, [])
-        assert 'z -> 2  did not match 1' in exc.value.args[0]
+        assert 'z -> 2 did not match 1' in exc.value.args[0]
 

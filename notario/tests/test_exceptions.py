@@ -37,12 +37,12 @@ class TestInvalid(object):
     def test_full_message_for_value(self):
         error = exceptions.Invalid('3', ['foo', 'bar', 'baz'], pair='value')
         result = error.__str__()
-        assert "-> foo -> bar -> baz  did not match '3'" == result
+        assert "-> foo -> bar -> baz did not match '3'" == result
 
     def test_full_message_for_callable_with_value(self):
         error = exceptions.Invalid(foo, ['foo', 'bar', 'baz'], pair='value')
         result = error.__str__()
-        assert "-> foo -> bar -> baz  did not pass validation against callable: foo" == result
+        assert "-> foo -> bar -> baz did not pass validation against callable: foo" == result
 
 
 
