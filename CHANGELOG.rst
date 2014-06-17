@@ -1,3 +1,7 @@
+0.0.8
+-----
+* fail when dictionaries are empty and a schema is provided
+
 0.0.7
 -----
 * Fix odd spacing in error messages
