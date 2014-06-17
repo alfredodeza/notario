@@ -8,6 +8,16 @@ from notario.decorators import optional
 
 class TestValidate(object):
 
+    def test_simple_validation_against_empty_data(self):
+        data = {}
+        schema = (('a', 'b'))
+
+        with raises(Invalid) as exc:
+            validate(data, schema)
+
+        error = exc.value.args[0]
+        assert 'top level has no data to validate against schema' in error
+
     def test_most_simple_validation(self):
         data = {'a': 'a'}
         schema = (('a', 'b'))
