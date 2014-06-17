@@ -13,8 +13,9 @@ class Validator(object):
 
     def validate(self):
         if self.data == {} and self.schema:
-            reason = 'has no data to validate against schema'
-            raise Invalid(None, {}, msg=reason, reason=reason, pair='value')
+            msg = 'has no data to validate against schema'
+            reason = 'an empty dictionary object was provided'
+            raise Invalid(None, {}, msg=msg, reason=reason, pair='value')
         self.traverser(self.data, self.schema, [])
 
     def traverser(self, data, schema, tree):
