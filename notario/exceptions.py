@@ -61,7 +61,11 @@ class Invalid(NotarioException):
     """
 
     def _get_message(self):
-        return "%s %s" % (self._format_path(), self._format_message())
+        path = self._format_path()
+        message = self._format_message()
+        if path.endswith(' '):
+            return "%s%s" % (path, message)
+        return "%s %s" % (path, message)
 
 
 class NestedInvalid(Invalid):
