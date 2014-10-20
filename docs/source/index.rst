@@ -88,6 +88,20 @@ and not integer, forcing an ``Invalid`` exception:
     Invalid: -> foo  did not pass validation against callable: string
 
 
+Custom messaging
+----------------
+There is no need to use the reporting string from the exception as-is. In the
+example ``string()`` validator, we used a custom message: "not of type string"
+which can be used when the validation fails::
+
+    >>> try:
+    ...     validate(data, schema)
+    ... except Invalid as e:
+    ...     print e.reason
+    ...
+    not of type string
+
+
 Validators
 ----------
 ``notario`` comes with a few validators, most of them provide a low level
