@@ -1,6 +1,9 @@
 
 .. image:: http://notario.cafepais.com/_static/notario.jpg
 
+.. image:: https://badge.fury.io/py/notario.svg
+                :target: https://badge.fury.io/py/rhcephpkg
+
 
 
 notario
