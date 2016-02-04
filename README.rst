@@ -1,5 +1,5 @@
 
-.. image:: http://notario.cafepais.com/docs/_static/notario.jpg
+.. image:: http://notario.cafepais.com/_static/notario.jpg
 
 
 
