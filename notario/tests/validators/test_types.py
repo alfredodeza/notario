@@ -1,5 +1,6 @@
 from pytest import raises
 from notario.validators import types
+from notario.tests import util
 
 #
 # Most of these are just excercising the code really
@@ -143,7 +144,8 @@ class TestTypesDelegating(object):
 
         with raises(AssertionError) as exc:
             validate('123')
-        assert exc.value.args[0] == 'too long'
+        result = util.assert_message(exc)
+        assert result == 'too long'
 
     def test_boolean_decorated(self):
         @types.boolean
@@ -152,7 +154,8 @@ class TestTypesDelegating(object):
 
         with raises(AssertionError) as exc:
             validate(True)
-        assert exc.value.args[0] == 'not false'
+        result = util.assert_message(exc)
+        assert result == 'not false'
 
     def test_dictionary_decorated(self):
         @types.dictionary
@@ -161,7 +164,8 @@ class TestTypesDelegating(object):
 
         with raises(AssertionError) as exc:
             validate({'a': 1, 'b': 2})
-        assert exc.value.args[0] == 'too long'
+        result = util.assert_message(exc)
+        assert result == 'too long'
 
     def test_array_decorated(self):
         @types.array
@@ -170,7 +174,8 @@ class TestTypesDelegating(object):
 
         with raises(AssertionError) as exc:
             validate([1, 2])
-        assert exc.value.args[0] == 'too long'
+        result = util.assert_message(exc)
+        assert result == 'too long'
 
     def test_integer_fail(self):
         @types.integer
@@ -179,4 +184,6 @@ class TestTypesDelegating(object):
 
         with raises(AssertionError) as exc:
             validate(3)
-        assert exc.value.args[0] == 'too big'
+
+        result = util.assert_message(exc)
+        assert result == 'too big'

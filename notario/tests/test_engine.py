@@ -3,6 +3,7 @@ from notario import engine
 from notario.exceptions import Invalid, SchemaError
 from notario.validators import recursive, iterables, types
 from notario.decorators import optional
+from notario.tests import util
 
 
 class TestEnforce(object):
@@ -33,7 +34,8 @@ class TestEnforce(object):
         def callable_message(v): assert False, "this is completely False"
         with raises(Invalid) as exc:
             engine.enforce(1, callable_message, ['1'], 'key')
-        assert exc.value.reason == "this is completely False"
+        result = util.assert_message(exc.value.reason)
+        assert result  == "this is completely False"
 
 
 class TestValidator(object):
