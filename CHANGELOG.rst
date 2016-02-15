@@ -1,3 +1,10 @@
+0.0.9
+-----
+15-Feb-2016
+
+* Improve tests to work with latest py.test release that broke assertion errors
+* Include the license file when cutting a release
+
 0.0.8
 -----
 * fail when dictionaries are empty and a schema is provided
