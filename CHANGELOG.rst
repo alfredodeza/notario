@@ -1,3 +1,10 @@
+0.0.10
+------
+23-Feb-2016
+
+* Fixes an issue when extra items in a schema are required but missing from
+  data but would not raise Invalid.
+
 0.0.9
 -----
 15-Feb-2016
