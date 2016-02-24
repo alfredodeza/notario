@@ -69,8 +69,9 @@ class Validator(object):
             for i in missing_indexes:
                 if not hasattr(schema[i], 'is_optional'):
                     required_key = schema[i][0]
-                    tree.append('list[%s]' % i)
-                    raise Invalid(required_key, tree, reason="required item in schema is missing", pair='key')
+                    tree.append('item[%s]' % i)
+                    msg = "required item in schema is missing: %s" % str(required_key)
+                    raise Invalid(required_key, tree, reason=msg, pair='key')
 
 
     def key_leaf(self, data, schema, tree):
