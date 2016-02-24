@@ -1,3 +1,10 @@
+0.0.11
+------
+24-Feb-2016
+
+* Improves the error message when an schema item is required but the data is
+  missing it. Before it assumed it was a list item.
+
 0.0.10
 ------
 23-Feb-2016
