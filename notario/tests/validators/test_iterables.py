@@ -1,5 +1,5 @@
 from pytest import raises
-from notario.validators import iterables
+from notario.validators import iterables, types
 from notario.exceptions import Invalid, SchemaError
 
 
@@ -116,3 +116,13 @@ class TestAllItems(object):
 
         error = exc.value.args[0]
         assert  '-> list[0] item did not match 1' in error
+
+    def test_fails_when_missing_items(self):
+        data = [{"host": "example.com"}]
+        schema = (("host", types.string),("interface", types.string))
+        all_items = iterables.AllItems(schema)
+        with raises(Invalid) as exc:
+            all_items(data, [])
+        error = exc.value.args[0]
+        assert  "-> list[0] -> list[1] did not match 'interface'" in  error
+        assert '(required item in schema is missing)' in error
