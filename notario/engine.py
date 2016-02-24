@@ -32,8 +32,10 @@ class Validator(object):
                 reason = "must_validate attribute must not be empty"
                 raise SchemaError(data, tree, reason=reason)
             data = sift(data, schema.must_validate)
-
         schema = self.sanitize_optionals(data, schema, tree)
+
+        validated_indexes = []
+        skip_missing_indexes = getattr(schema, 'must_validate', False)
 
         for index in range(len(data)):
             self.length_equality(data, schema, index, tree)
@@ -53,11 +55,23 @@ class Validator(object):
             if tree:
                 tree.pop()
 
+            validated_indexes.append(index)
+
         # XXX There is a chance we might have missing items from
         # the incoming data that are labeled as required from the schema
         # we should make sure *here* that we account for that and raise
         # the appropriate exception. Since the loop finished and everything
         # seems to have passed, this lack of check will give false positives.
+        missing_indexes = set(schema.keys()).difference(validated_indexes)
+        if missing_indexes:
+            if skip_missing_indexes:
+                return
+            for i in missing_indexes:
+                if not hasattr(schema[i], 'is_optional'):
+                    required_key = schema[i][0]
+                    tree.append('list[%s]' % i)
+                    raise Invalid(required_key, tree, reason="required item in schema is missing", pair='key')
+
 
     def key_leaf(self, data, schema, tree):
         """
