@@ -143,7 +143,7 @@ class TestCherryPick(object):
 
     def test_validate_custom_items(self):
         data = {'a': {'b': 'b', 'c': 'c', 'd': 'd'}}
-        picky = cherry_pick((('b' ,'b'), ('c', 'd')))
+        picky = cherry_pick((('b' ,'b')))
         picky.must_validate = ('b',)
         schema = ('a', picky)
 
