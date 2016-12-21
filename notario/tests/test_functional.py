@@ -28,6 +28,16 @@ class TestValidate(object):
         error = exc.value.args[0]
         assert  "-> a -> a did not match 'b'" in error
 
+    def test_required_key_is_missing(self):
+        data = {'a': 'a', 'c': 'c'}
+        schema = (('a', 'a'), ('b', 'b'), ('c', 'c'))
+
+        with raises(Invalid) as exc:
+            validate(data, schema)
+
+        error = exc.value.args[0]
+        assert  "key did not match schema" in error
+        assert  "required key in data is missing: b" in error
     def test_key_is_empty_string(self):
         data = {'a': ''}
         schema = (('a', 'b'))
