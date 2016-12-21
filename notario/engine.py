@@ -32,10 +32,42 @@ class Validator(object):
                 reason = "must_validate attribute must not be empty"
                 raise SchemaError(data, tree, reason=reason)
             data = sift(data, schema.must_validate)
+
         schema = self.sanitize_optionals(data, schema, tree)
 
         validated_indexes = []
         skip_missing_indexes = getattr(schema, 'must_validate', False)
+
+        if len(data) < len(schema):
+            # we have missing required items in data, but we don't know
+            # which ones so find what may fail:
+            data_keys = [v[1] for v in data.values()]
+            schema_keys = [v[1] for v in schema.values()]
+
+            def enforce_once(data_keys, schema_key):
+                # XXX Go through all the data keys and try and see if they pass
+                # validation against the schema. At this point it is impossible
+                # to know which data key corresponds to what schema key
+                # (because schema keys can be a function/callable) so it is
+                # a *very* naive way to try and detect which one might be
+                # missing
+                for data_key in data_keys:
+                    failed = None
+                    try:
+                        enforce(data_key, schema_key, tree, pair='key')
+                        return
+                    except Invalid:
+                        failed = data_key, schema_key
+
+                    if failed:
+                        return failed
+
+            for schema_key in schema_keys:
+                failure = enforce_once(data_keys, schema_key)
+                if failure:
+                    _, failed_schema_key = failure
+                    msg = "required key in data is missing: %s" % str(failed_schema_key)
+                    raise Invalid(None, tree, reason=msg, pair='key')
 
         for index in range(len(data)):
             self.length_equality(data, schema, index, tree)
