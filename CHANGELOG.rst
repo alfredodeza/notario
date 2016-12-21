@@ -1,3 +1,9 @@
+0.0.12
+------
+21-Dec-2016
+
+* Detect missing data keys
+
 0.0.11
 ------
 24-Feb-2016
