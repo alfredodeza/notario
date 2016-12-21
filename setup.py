@@ -12,7 +12,6 @@ setup(
     description      = 'A dictionary validator',
     packages         = find_packages(),
     author           = 'Alfredo Deza',
-    author_email     = 'alfredodeza [at] gmail.com',
     version          = metadata['version'],
     url              = 'http://github.com/alfredodeza/notario',
     license          = "MIT",
