@@ -36,6 +36,8 @@ class NotarioException(Exception):
         reason = self._formatted_reason()
         if self._msg:
             return self._msg
+        if self.schema_item is None:
+            return "did not match schema %s" % reason
         if is_callable(self.schema_item):
             msg = "did not pass validation against callable: %s"\
                   "%s" % (self.schema_item.__name__, reason)
