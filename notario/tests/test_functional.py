@@ -1,9 +1,9 @@
 from pytest import raises
-from notario import validate
+from notario import validate, ensure
 from notario.exceptions import Invalid, SchemaError
 from notario.validators import (iterables, recursive, types,
                                 chainable, cherry_pick, Hybrid)
-from notario.decorators import optional
+from notario.decorators import optional, instance_of
 
 
 class TestValidate(object):
@@ -17,6 +17,38 @@ class TestValidate(object):
 
         error = exc.value.args[0]
         assert 'top level has no data to validate against schema' in error
+
+    def test_single_level(self):
+        data = {'members': ['1']}
+        schema = ('members', types.array)
+        validate(data,schema)
+
+
+    def test_instance_of_dict_or_list(self):
+        #from notario.utils import forced_leaf_validator
+        @instance_of((list, dict))
+        def valid_custom(value):
+            ensure(len(value) > 0)
+
+        data_dict = {'foo' : {"some string": 1}}
+        data_list = {'foo' : ['a', 'b']}
+        schema = ('foo', valid_custom)
+        validate(data_dict, schema)
+        validate(data_list, schema)
+
+    def test_fail_instance_of_dict(self):
+        #from notario.utils import forced_leaf_validator
+        @instance_of((dict,))
+        def valid_custom(value):
+            ensure(len(value) > 5, "%s does not have len of 5" % value)
+
+        data_dict = {'foo' : {"some string": 1}}
+        schema = ('foo', valid_custom)
+        with raises(AssertionError) as exc:
+            validate(data_dict, schema)
+        error = exc.value.args[0]
+        assert "{'some string': 1}" in error
+        assert "does not have len of 5" in error
 
     def test_most_simple_validation(self):
         data = {'a': 'a'}
