@@ -30,6 +30,15 @@ class TestInstanceOf(object):
         assert 'not of any valid types' in exc_msg
         assert 'str' in exc_msg
 
+    def test_validate_dict_or_list(self):
+        @decorators.instance_of((list,dict))
+        def validator(value):
+            assert True # pragma: no cover
+
+        assert validator([]) is None
+        assert validator({}) is None
+
+
     def test_custom_class(self):
         class Foo(object):
             pass
