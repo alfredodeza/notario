@@ -46,13 +46,22 @@ class instance_of(object):
 
     def __init__(self, valid_types=None):
         self.valid_types = valid_types or (list, dict, str)
+        self.__validator_leaf__ = False
+        for t in self.valid_types:
+            if t is dict or isinstance(t, dict):
+                self.__validator_leaf__ = True
 
     def __call__(self, func):
         fail_msg = "not of any valid types: %s" % self.valid_names()
 
-        def decorated(value):
+        def decorated(value, *a):
+            if self.__validator_leaf__ is True:
+                if isinstance(value, dict):
+                    # convert the 'data' to an actual value. 'data' is of {0: {'key': 'value'}}
+                    value = dict(i for i in value.values())
             ensure(isinstance(value, self.valid_types), fail_msg)
             func(value)
+        decorated.__validator_leaf__ = self.__validator_leaf__
         return decorated
 
     def valid_names(self):
