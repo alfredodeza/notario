@@ -170,8 +170,64 @@ class TestValidate(object):
         error = exc.value.args[0]
         assert  "-> a -> a key did not match 'b'" in error
 
+class TestDefinedKeys(object):
+
+    # a.k.a. cherry picked validator
+
+    def test_top_level_cherry_pick_with_optionals_passes(self):
+        data = {'b': 'b', 'c': 'c', 'd': 'd'}
+        schema = (
+            ('b', types.string),
+            (optional('optional'), types.string)
+        )
+
+        assert validate(data, schema, defined_keys=True) is None
+
+    def test_top_level_cherry_pick_with_optionals_complains(self):
+        data = {'b': 'b', 'optional': 1, 'garbage': 'yes'}
+        schema = (
+            ('b', types.string),
+            (optional('optional'), types.string)
+        )
+
+        with raises(Invalid) as exc:
+            validate(data, schema, defined_keys=True)
+        error = exc.value.args[0]
+        assert '1 did not pass validation against callable: string' in error
+
+    def test_validate_only_one_item(self):
+        data = {'b': 'b', 'c': 'c', 'd': 'd'}
+        schema = ('d', 'a')
+
+        with raises(Invalid) as exc:
+            validate(data, schema, defined_keys=True)
+
+        error = exc.value.args[0]
+        assert  "-> d -> d did not match 'a'" in error
+
 
 class TestCherryPick(object):
+
+    def test_top_level_cherry_pick_with_optionals_passes(self):
+        data = {'b': 'b', 'c': 'c', 'd': 'd'}
+        schema = cherry_pick((
+            ('b', types.string),
+            (optional('optional'), types.string))
+        )
+
+        assert validate(data, schema) is None
+
+    def test_top_level_cherry_pick_with_optionals_complains(self):
+        data = {'b': 'b', 'optional': 1}
+        schema = (cherry_pick(
+            ('b', types.string),),
+            (optional('optional'), types.string)
+        )
+
+        with raises(Invalid) as exc:
+            validate(data, schema)
+        error = exc.value.args[0]
+        assert '1 did not pass validation against callable: string' in error
 
     def test_validate_only_one_item(self):
         data = {'a': {'b': 'b', 'c': 'c', 'd': 'd'}}
