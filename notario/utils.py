@@ -65,6 +65,13 @@ def sift(data, required_items=None):
     for k, v in data.items():
         if v[0] in required_items:
             new_data[k] = v
+            continue
+        for required_item in required_items:
+            key = getattr(required_item, '_object', False)
+            if key:
+                if v[0] == key:
+                    new_data[k] = v
+
     return re_sort(new_data)
 
 
