@@ -18,7 +18,6 @@ Documentation: http://notario.cafepais.com
 
 Tested against:
 
-* Python 2.6
 * Python 2.7
 * Python 3.3
 * Python 3.4
