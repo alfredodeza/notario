@@ -42,6 +42,10 @@ class TestOptionalDecorator(object):
         assert result() == 'value'
 
 
+class RequiredItem(object):
+    _object = ''
+
+
 class TestSift(object):
 
     def test_no_required_items(self):
@@ -54,6 +58,13 @@ class TestSift(object):
         data = Data({'a': 1, 'b': 2}, {}).normalized()
         result = utils.sift(data, ['b'])
         assert result == {0: ('b', 2)}
+
+    def test_required_item_is_function_with_object(self):
+        item = RequiredItem()
+        item._object = 'a'
+        data = Data({'a': 1, 'b': 2}, {}).normalized()
+        result = utils.sift(data, [item])
+        assert result == {0: ('a', 1)}
 
 
 class TestReSort(object):
