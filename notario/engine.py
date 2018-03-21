@@ -3,11 +3,14 @@ from notario.exceptions import Invalid, SchemaError
 from notario.utils import (is_callable, sift, is_empty, re_sort, is_not_empty,
                            data_item, safe_repr, ensure)
 from notario.normal import Data, Schema
+from notario.validators import cherry_pick
 
 
 class Validator(object):
 
-    def __init__(self, data, schema):
+    def __init__(self, data, schema, defined_keys=None):
+        if defined_keys:
+            schema = cherry_pick(schema)
         self.data = Data(data, schema).normalized()
         self.schema = Schema(data, schema).normalized()
 
@@ -308,7 +311,7 @@ def enforce(data_item, schema_item, tree, pair):
             raise Invalid(schema_item, tree, reason=e, pair=pair)
 
 
-def validate(data, schema):
+def validate(data, schema, defined_keys=False):
     """
     Main entry point for the validation engine.
 
@@ -316,7 +319,7 @@ def validate(data, schema):
     :param schema: The schema from which data will be validated against
     """
     if isinstance(data, dict):
-        validator = Validator(data, schema)
+        validator = Validator(data, schema, defined_keys=defined_keys)
         validator.validate()
     else:
         raise TypeError('expected data to be of type dict, but got: %s' % type(data))
