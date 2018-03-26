@@ -205,6 +205,38 @@ class TestDefinedKeys(object):
         error = exc.value.args[0]
         assert  "-> d -> d did not match 'a'" in error
 
+    def test_optional_is_kept_optional(self):
+        data = {'b': 'b', 'c': 'c', 'd': 'd'}
+        schema = (
+            ('d', 'd'),
+            (optional('f'), 'f'),
+        )
+
+        result = validate(data, schema, defined_keys=True)
+        assert result is None
+
+    def test_everything_optional_is_allowed(self):
+        data = {'b': 'b', 'c': 'c', 'd': 'd'}
+        schema = (
+            (optional('z'), 'd'),
+            (optional('f'), 'f'),
+        )
+
+        result = validate(data, schema, defined_keys=True)
+        assert result is None
+
+    def test_optional_does_not_affect_cherry_picked(self):
+        data = {'b': 'b', 'c': 'c', 'd': 'd'}
+        schema = (
+            ('d', 'a'),
+            (optional('f'), 'f'),
+        )
+
+        with raises(Invalid) as exc:
+            validate(data, schema, defined_keys=True)
+
+        error = exc.value.args[0]
+        assert  "-> d -> d did not match 'a'" in error
 
 class TestCherryPick(object):
 
