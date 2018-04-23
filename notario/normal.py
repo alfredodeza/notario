@@ -1,10 +1,11 @@
+import copy
 from notario.utils import ndict, is_nested_tuple
 
 
 class BaseNormalize(object):
 
     def __init__(self, data, schema):
-        self.raw_data = data
+        self.raw_data = copy.deepcopy(data)
         self.raw_schema = schema
 
     def ordered_dict(self, data_structure, use_n_dict=False):
