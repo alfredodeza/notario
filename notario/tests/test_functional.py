@@ -293,6 +293,16 @@ class TestCherryPick(object):
         error = exc.value.args[0]
         assert  "-> a  must_validate attribute must not be empty" in error
 
+    def test_complain_about_non_alpha_schema(self):
+        data = {'a': 'a', 'b': 'b', 'c': 'c'}
+        schema = (('b' ,'b'), ('a', 'a'), ('c', 'c'))
+
+        with raises(SchemaError) as exc:
+            validate(data, schema)
+
+        error = exc.value.args[0]
+        assert  "b  schema item is not alphabetically ordered" in error
+
 
 class TestHybrid(object):
 
