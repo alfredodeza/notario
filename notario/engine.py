@@ -37,6 +37,7 @@ class Validator(object):
             data = sift(data, schema.must_validate)
 
         schema = self.sanitize_optionals(data, schema, tree)
+        self.is_alpha_ordered(data, schema, tree)
 
         validated_indexes = []
         skip_missing_indexes = getattr(schema, 'must_validate', False)
@@ -131,6 +132,22 @@ class Validator(object):
         if hasattr(schema_value, '__validator_leaf__'):
             return schema_value(value, tree)
         enforce(value, schema_value, tree, 'value')
+
+    def is_alpha_ordered(self, data, normalized_schema, tree):
+        keys = []
+        indexes = normalized_schema.keys()
+        for index in indexes: #, _tuple in normalized_schema.items():
+            if isinstance(normalized_schema[index][0], str):
+                keys.append(normalized_schema[index][0])
+
+        sorted_keys = sorted(keys)
+        if keys != sorted_keys:
+            for index, key in enumerate(keys):
+                if key != sorted_keys[index]:
+                    raise SchemaError(
+                        keys, [key],
+                        reason='schema item is not alphabetically ordered'
+                    )
 
     def length_equality(self, data, schema, index, tree):
         try:
