@@ -122,43 +122,43 @@ class TestValidate(object):
 
     def test_multi_pair_non_nested_last_key(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
-        schema = (('a', 'a'), ('b', 'b'), ('c', 'c'), ('a', 'a'))
+        schema = (('a', 'a'), ('b', 'b'), ('c', 'c'), ('z', 'a'))
 
         with raises(Invalid) as exc:
             validate(data, schema)
 
         error = exc.value.args[0]
-        assert  "-> d key did not match 'a'" in error
+        assert  "-> d key did not match 'z'" in error
 
     def test_multi_pair_non_nested_first_key(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
-        schema = (('f', 'a'), ('b', 'b'), ('c', 'c'), ('d', 'd'))
+        schema = (('aa', 'a'), ('b', 'b'), ('c', 'c'), ('d', 'd'))
 
         with raises(Invalid) as exc:
             validate(data, schema)
 
         error = exc.value.args[0]
-        assert  "-> a key did not match 'f'" in error
+        assert  "-> a key did not match 'aa'" in error
 
     def test_multi_pair_non_nested_second_key(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
-        schema = (('a', 'a'), ('f', 'b'), ('c', 'c'), ('d', 'd'))
+        schema = (('a', 'a'), ('bb', 'b'), ('c', 'c'), ('d', 'd'))
 
         with raises(Invalid) as exc:
             validate(data, schema)
 
         error = exc.value.args[0]
-        assert  "-> b key did not match 'f'" in error
+        assert  "-> b key did not match 'bb'" in error
 
     def test_multi_pair_non_nested_third_key(self):
         data = {'a': 'a', 'b':'b', 'c':'c', 'd':'d'}
-        schema = (('a', 'a'), ('b', 'b'), ('f', 'c'), ('d', 'a'))
+        schema = (('a', 'a'), ('b', 'b'), ('cc', 'c'), ('d', 'a'))
 
         with raises(Invalid) as exc:
             validate(data, schema)
 
         error = exc.value.args[0]
-        assert  "-> c key did not match 'f'" in error
+        assert  "-> c key did not match 'cc'" in error
 
     def test_key_fails_before_value(self):
         data = {'a': {'a': {'b': 'b'}}}
@@ -292,6 +292,16 @@ class TestCherryPick(object):
 
         error = exc.value.args[0]
         assert  "-> a  must_validate attribute must not be empty" in error
+
+    def test_complain_about_non_alpha_schema(self):
+        data = {'a': 'a', 'b': 'b', 'c': 'c'}
+        schema = (('b' ,'b'), ('a', 'a'), ('c', 'c'))
+
+        with raises(SchemaError) as exc:
+            validate(data, schema)
+
+        error = exc.value.args[0]
+        assert  "b  schema item is not alphabetically ordered" in error
 
 
 class TestHybrid(object):
