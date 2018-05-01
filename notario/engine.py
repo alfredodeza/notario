@@ -136,9 +136,13 @@ class Validator(object):
     def is_alpha_ordered(self, data, normalized_schema, tree):
         keys = []
         indexes = normalized_schema.keys()
-        for index in indexes: #, _tuple in normalized_schema.items():
-            if isinstance(normalized_schema[index][0], str):
-                keys.append(normalized_schema[index][0])
+        for index in indexes:
+            key = normalized_schema[index][0]
+            if isinstance(key, str):
+                keys.append(key)
+            elif hasattr(key, '_object') :
+                if isinstance(key._object, str):
+                    keys.append(key._object)
 
         sorted_keys = sorted(keys)
         if keys != sorted_keys:

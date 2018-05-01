@@ -303,6 +303,15 @@ class TestCherryPick(object):
         error = exc.value.args[0]
         assert  "b  schema item is not alphabetically ordered" in error
 
+    def test_complain_about_non_alpha_optional_schema(self):
+        data = {'a': 'a', 'b': 'b', 'c': 'c'}
+        schema = ((optional('b') ,'b'), ('a', 'a'), ('c', 'c'))
+
+        with raises(SchemaError) as exc:
+            validate(data, schema)
+
+        error = exc.value.args[0]
+        assert  "b  schema item is not alphabetically ordered" in error
 
 class TestHybrid(object):
 
