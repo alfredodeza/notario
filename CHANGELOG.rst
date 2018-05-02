@@ -1,3 +1,15 @@
+0.0.13
+------
+2-May-2018
+
+* Prevent issues with dicts in decorators (with ``instance_of``)
+* Allow required items to be objects when sifting through schema/data
+* Allow a global ``cherry_pick`` on schemas
+* Removes Python 2.6 tests/docs/support
+* Complain when non-alpha-ordered schemas are detected, raising
+  a ``SchemaError``
+* Prevent altering incoming data by doing a ``deepcopy`` before mangling
+
 0.0.12
 ------
 21-Dec-2016
