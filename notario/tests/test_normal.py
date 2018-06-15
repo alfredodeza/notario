@@ -1,3 +1,5 @@
+import re
+
 from notario import normal
 
 
@@ -21,3 +23,8 @@ class TestSchema(object):
         data = (('a', 'b'), ('b', 'b'), ('c', 'c'))
         result = normal.Schema({}, data).normalized()
         assert result == {0: ('a', 'b'), 1: ('b', 'b'), 2: ('c', 'c')}
+
+    def test_unserializable_object(self):
+        regex = re.compile(".*")
+        result = normal.Schema({"foo": regex}, ['a']).normalized()
+        assert result == {0: ['a']}
