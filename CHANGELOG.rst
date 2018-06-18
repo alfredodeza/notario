@@ -1,3 +1,9 @@
+0.0.14
+------
+18-Jun-2018
+
+* Avoid deepcopy woes by copying schema with ``dict()``
+
 0.0.13
 ------
 2-May-2018
