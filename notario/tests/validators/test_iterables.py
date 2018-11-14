@@ -124,5 +124,5 @@ class TestAllItems(object):
         with raises(Invalid) as exc:
             all_items(data, [])
         error = exc.value.args[0]
-        assert  "-> list[0] -> item[1] did not match 'interface'" in  error
-        assert "(required item in schema is missing: interface)" in error
+        assert  "list[0] did not match schema" in error
+        assert "(required key in data is missing: interface)" in error
