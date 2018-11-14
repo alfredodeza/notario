@@ -45,8 +45,8 @@ class Validator(object):
         if len(data) < len(schema):
             # we have missing required items in data, but we don't know
             # which ones so find what may fail:
-            data_keys = [v[1] for v in data.values()]
-            schema_keys = [v[1] for v in schema.values()]
+            data_keys = [v[0] for v in data.values()]
+            schema_keys = [v[0] for v in schema.values()]
 
             def enforce_once(data_keys, schema_key):
                 # XXX Go through all the data keys and try and see if they pass
