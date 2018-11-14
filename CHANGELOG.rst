@@ -1,3 +1,10 @@
+0.0.15
+------
+14-Nov-2018
+
+* Correctly detect missing keys (not values!) from incoming data.
+
+
 0.0.14
 ------
 18-Jun-2018
