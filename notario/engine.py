@@ -66,6 +66,14 @@ class Validator(object):
                     if failed:
                         return failed
 
+            # if there are no callables in the schema keys, just
+            # find the missing data key directly
+            if all([not is_callable(s) for s in schema_keys]):
+                for schema_key in schema_keys:
+                    if schema_key not in data_keys:
+                        msg = "required key in data is missing: %s" % str(schema_key)
+                        raise Invalid(None, tree, reason=msg, pair='key')
+
             for schema_key in schema_keys:
                 failure = enforce_once(data_keys, schema_key)
                 if failure:
