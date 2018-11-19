@@ -1,9 +1,14 @@
+0.0.16
+------
+19-Nov-2018
+
+* Improve accurace of missing key in schema when no keys are callable ones.
+
 0.0.15
 ------
 14-Nov-2018
 
 * Correctly detect missing keys (not values!) from incoming data.
-
 
 0.0.14
 ------
