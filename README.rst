@@ -1,6 +1,4 @@
 
-.. image:: http://notario.cafepais.com/_static/notario.jpg
-
 .. image:: https://badge.fury.io/py/notario.svg
                 :target: https://badge.fury.io/py/rhcephpkg
 
@@ -13,8 +11,6 @@ validate against both keys *and* values. Schemas are smaller and readable
 representations of data being validated.
 
 Fully documented and thoroughly tested.
-
-Documentation: http://notario.cafepais.com
 
 Tested against:
 
